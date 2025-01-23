@@ -29,7 +29,7 @@ function createSpotlightWindow() {
 
     spotlightWindow = new BrowserWindow({
         width: 600,
-        height: 60,
+        height: 60,  // Initial height for single-line input
         frame: false,
         center: true,
         show: false,
@@ -44,10 +44,11 @@ function createSpotlightWindow() {
     spotlightWindow.loadFile('windows/spotlight.html');
 
     const hideSpotlightWindow = () => {
-        if (spotlightWindow && spotlightWindow.isVisible()) {
-            spotlightWindow.setVisibleOnAllWorkspaces(false);
-            spotlightWindow.hide();
-        }
+        // test - ignore hiding window
+        // if (spotlightWindow && spotlightWindow.isVisible()) {
+        //     spotlightWindow.setVisibleOnAllWorkspaces(false);
+        //     spotlightWindow.hide();
+        // }
     };
 
     // Focus input when window is shown
@@ -73,6 +74,15 @@ function createSpotlightWindow() {
 
     // Remove the before-input-event handler since we'll handle ESC in renderer
     spotlightWindow.webContents.removeAllListeners('before-input-event');
+
+    // Add resize handler
+    ipcMain.on('resize-spotlight', (_, height) => {
+        if (spotlightWindow) {
+            const [width] = spotlightWindow.getSize();
+            spotlightWindow.setSize(width, height);
+            spotlightWindow.center();
+        }
+    });
 }
 
 function createSettingsWindow() {
@@ -194,4 +204,8 @@ ipcMain.handle('load-locale', async (event, locale) => {
         console.error(`Error loading locale ${locale}:`, error);
         return {};
     }
+});
+
+ipcMain.on('spotlight-content', (_, content) => {
+  console.log('Received from spotlight:', content);
 });
