@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spotlight</title>
+    <link rel="stylesheet" href="spotlight.css" />
+  </head>
+  <body>
+    <input type="text" id="searchInput" placeholder="Type something..." />
+    <script>
+      const { ipcRenderer } = require('electron');
+      const searchInput = document.getElementById('searchInput');
+      
+      // Focus input when window loads
+      window.addEventListener('load', () => {
+        searchInput.focus();
+      });
+
+      // Focus input when receiving message from main process
+      ipcRenderer.on('focus-input', () => {
+        searchInput.focus();
+      });
+
+      // Handle ESC key in renderer process
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          ipcRenderer.send('hide-window');
+        }
+      });
+    </script>
+  </body>
+</html>

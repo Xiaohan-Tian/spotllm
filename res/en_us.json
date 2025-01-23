@@ -1,0 +1,29 @@
+{
+    "settings": {
+        "model": {
+            "title": "Model",
+            "description": "Please choose the model you want to use.",
+            "options": {
+                "gpt4": "OpenAI GPT-4",
+                "gpt4mini": "OpenAI GPT-4o-mini",
+                "geminiPro": "Google Gemini-1.5-Pro",
+                "geminiFlash": "Google Gemini-1.5-Flash",
+                "geminiFlash8b": "Google Gemini-1.5-Flash-8B",
+                "claudeSonnet": "Anthropic Claude 3.5 Sonnet",
+                "claudeOpus": "Anthropic Claude 3.5 Opus",
+                "claudeHaiku": "Anthropic Claude 3.5 Haiku",
+                "private": "OpenAI-Compatible Private Server"
+            }
+        },
+        "apiKey": {
+            "title": "API KEY",
+            "description": "Please put your API KEY inside of the input box",
+            "placeholder": "Enter your API key"
+        },
+        "hostUrl": {
+            "title": "Host Base URL",
+            "description": "Please provide the base URL of the private OpenAI API-compatible server.",
+            "placeholder": "https://your-server.com/v1"
+        }
+    }
+}

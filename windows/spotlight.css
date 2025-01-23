@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    -webkit-app-region: drag;
+}
+  
+#searchInput {
+    width: 90%;
+    height: 40px;
+    font-size: 18px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    outline: none;
+    -webkit-app-region: no-drag;
+}
+  
