@@ -2,8 +2,9 @@ body {
     margin: 0;
     background-color: rgba(255, 255, 255, 0.95);
     display: flex;
+    flex-direction: column;  /* Make children stack vertically */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;  /* Align content to top */
     height: 100vh;
     -webkit-app-region: drag;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -11,7 +12,7 @@ body {
   
 #inputContainer {
     width: 100%;
-    padding: 0 20px;
+    padding: 10px 20px;
     box-sizing: border-box;
 }
 
@@ -22,7 +23,7 @@ body {
     border-radius: 6px;
     background-color: transparent;
     outline: none;
-    -webkit-app-region: no-drag;
+    -webkit-app-region: no-drag;    
     box-sizing: border-box;
     font-family: inherit;
 }
@@ -40,5 +41,42 @@ body {
     line-height: 1.25;
     resize: none;
     display: none;
+}
+
+#statusContainer {
+    border-top: 1px solid #e0e0e0;  /* Add separator */
+    width: 100%;
+    padding: 10px 30px;  /* Match input padding */
+    box-sizing: border-box;
+    display: none;  /* Hidden by default */
+}
+
+@keyframes pulseText {
+    0% { color: #e0e0e0; }
+    45%, 55% { color: #333; } /* Plateau in the middle for more overlap */
+    100% { color: #e0e0e0; }
+}
+
+.animated-text {
+    display: inline-block;
+    color: #e0e0e0;
+}
+
+.animated-text.animating {
+    animation: 
+        pulseText var(--pulse-duration, 0.8s) ease-in-out 1;
+    animation-duration: var(--pulse-duration, 0.8s);
+    animation-iteration-count: 1;
+    animation-delay: calc(
+        (0.08s * var(--char-index, 0)) + /* Shorter delay between characters */
+        (var(--total-duration) * var(--wave-count, 0))
+    );
+}
+
+#statusText {
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    gap: 1px;
 }
   

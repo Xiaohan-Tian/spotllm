@@ -5,9 +5,8 @@ const inputContainer = document.getElementById('inputContainer');
 const searchInput = document.getElementById('searchInput');
 const searchTextarea = document.getElementById('searchTextarea');
 
-// Constants for sizing
-const SINGLE_LINE_HEIGHT = 60;  // Window height for single-line input
-const MULTI_LINE_HEIGHT = 180;  // Window height for textarea (approximately 5 lines)
+// Add new elements
+const statusContainer = document.getElementById('statusContainer');
 
 // Log hello world when window launches
 console.log('Hello World - Spotlight window launched');
@@ -17,6 +16,10 @@ window.addEventListener('load', () => {
   searchInput.focus();
 });
 
+// Remove the animation configuration constants and setupAnimatedText function
+// Instead, add this variable to store the cleanup function
+let currentAnimation = null;
+
 // Focus input when receiving message from main process
 ipcRenderer.on('focus-input', () => {
   if (searchTextarea.style.display === 'none') {
@@ -24,12 +27,22 @@ ipcRenderer.on('focus-input', () => {
   } else {
     searchTextarea.focus();
   }
+  if (currentAnimation) {
+    currentAnimation();
+    currentAnimation = null;
+  }
+  statusContainer.style.display = 'none';
 });
 
-// Handle key events
+// Update the Enter key handler
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
+    if (currentAnimation) {
+      currentAnimation();
+      currentAnimation = null;
+    }
+    statusContainer.style.display = 'none';
     ipcRenderer.send('hide-window');
     return;
   }
@@ -44,11 +57,11 @@ document.addEventListener('keydown', (event) => {
       searchTextarea.focus();
       searchTextarea.selectionStart = searchTextarea.value.length;
       
-      // Request window resize
-      ipcRenderer.send('resize-spotlight', MULTI_LINE_HEIGHT);
+      // Request window resize to actual content height
+      ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
     } else if (event.shiftKey && searchTextarea.style.display !== 'none') {
       // Add new line in textarea mode
-      event.preventDefault();  // Prevent default newline behavior
+      event.preventDefault();
       const selectionStart = searchTextarea.selectionStart;
       searchTextarea.value = 
         searchTextarea.value.slice(0, selectionStart) + 
@@ -62,11 +75,25 @@ document.addEventListener('keydown', (event) => {
         searchTextarea.scrollTop = searchTextarea.scrollHeight;
       }
     } else {
-      // Send content to main process
-      event.preventDefault();  // Prevent default newline behavior
-      const content = searchTextarea.style.display === 'none' 
+      // Handle regular Enter press
+      event.preventDefault();
+      const content = searchTextarea.style.display === 'none' || !searchTextarea.style.display
         ? searchInput.value 
         : searchTextarea.value;
+      
+      // Update the status animation part:
+      if (currentAnimation) {
+        currentAnimation();
+      }
+      statusContainer.style.display = 'block';
+      currentAnimation = window.createTextWave(document.getElementById('statusText'));
+      
+      // Small delay to ensure the status container is rendered
+      setTimeout(() => {
+        ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
+      }, 0);
+      
+      // Send content to main process
       console.log('Sending content to main process:', content);
       ipcRenderer.send('spotlight-content', content);
     }

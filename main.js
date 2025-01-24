@@ -3,6 +3,7 @@ const path = require('path');
 const Jimp = require('jimp');
 const Store = require('electron-store');  // Use directly
 const fs = require('fs').promises;
+const LLM = require('./llms/llm');  // Add this import
 
 let tray = null;
 let spotlightWindow = null;
@@ -15,6 +16,9 @@ const store = new Store({
         hostUrl: '',
     }
 });
+
+// Initialize LLM instance
+const llm = LLM.create(store.get('model'), store.get('apiKey'), store.get('hostUrl'));
 
 if (process.platform === 'darwin') {
     app.dock.hide();
@@ -206,6 +210,21 @@ ipcMain.handle('load-locale', async (event, locale) => {
     }
 });
 
-ipcMain.on('spotlight-content', (_, content) => {
-  console.log('Received from spotlight:', content);
+ipcMain.on('spotlight-content', async (_, content) => {
+    console.log('Received from spotlight:', content);
+    
+    try {
+        const messages = [{ role: 'user', content: content }];
+        const stream = await llm.streamResponse(messages);
+        let fullResponse = '';
+        
+        for await (const chunk of stream) {
+            fullResponse += chunk;
+            console.log('Streaming chunk:', chunk);
+        }
+        
+        console.log('Full response:', fullResponse);
+    } catch (error) {
+        console.error('Error getting LLM streaming response:', error);
+    }
 });
