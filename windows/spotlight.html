@@ -7,6 +7,7 @@
   </head>
   <body>
     <div id="inputContainer">
+      <div id="appIcon"></div>
       <input type="text" id="searchInput" placeholder="Type something..." />
       <textarea 
         id="searchTextarea" 
@@ -16,7 +17,12 @@
     <div id="statusContainer">
       <p id="statusText">Working...</p>
     </div>
+    <div id="responseContainer">
+      <div id="responseContent"></div>
+      <div id="copyButton" title="Copy to clipboard"></div>
+    </div>
     <script src="utils/text-wave.js"></script>
+    <script src="utils/marked.min.js"></script>
     <script src="spotlight.js"></script>
   </body>
 </html>

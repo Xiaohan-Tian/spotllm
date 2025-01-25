@@ -22,7 +22,7 @@ class GeminiLLM extends LLM {
             .reverse()
             .find(msg => msg.role === 'user')?.content || '';
             
-        const response = `Gemini Streaming Response to: ${lastUserMessage}`;
+        const response = `Gemini Streaming Response to: **${lastUserMessage}**`;
         const words = response.split(' ');
         
         return async function* () {

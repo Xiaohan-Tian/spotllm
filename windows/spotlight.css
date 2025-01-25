@@ -3,22 +3,37 @@ body {
     background-color: rgba(255, 255, 255, 0.95);
     display: flex;
     flex-direction: column;  /* Make children stack vertically */
-    align-items: center;
+    align-items: stretch;    /* Make children stretch full width */
     justify-content: flex-start;  /* Align content to top */
-    height: 100vh;
+    min-height: 100vh;
     -webkit-app-region: drag;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
   
 #inputContainer {
+    flex: 0 0 auto;  /* Don't grow or shrink */
     width: 100%;
     padding: 10px 20px;
     box-sizing: border-box;
+    display: flex;  /* Enable flexbox for icon and input alignment */
+    /* gap: 10px;  Space between icon and input */
+    align-items: flex-start;  /* Align items to top */
+}
+
+#appIcon {
+    flex: 0 0 40px;  /* Fixed width of 40px */
+    height: 40px;
+    background-image: url('../icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    -webkit-app-region: drag;
+    opacity: 0.6;  /* Add 60% opacity */
 }
 
 #searchInput,
 #searchTextarea {
-    width: 100%;
+    flex: 1;  /* Take remaining space */
     border: none;
     border-radius: 6px;
     background-color: transparent;
@@ -44,11 +59,23 @@ body {
 }
 
 #statusContainer {
-    border-top: 1px solid #e0e0e0;  /* Add separator */
+    flex: 0 0 auto;  /* Don't grow or shrink */
     width: 100%;
-    padding: 10px 30px;  /* Match input padding */
+    padding: 10px 30px;
     box-sizing: border-box;
     display: none;  /* Hidden by default */
+    position: relative;
+}
+
+/* Add a pseudo-element for the border with margin */
+#statusContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background-color: #e0e0e0;
 }
 
 @keyframes pulseText {
@@ -78,5 +105,115 @@ body {
     margin: 0;
     display: flex;
     gap: 1px;
+}
+
+#responseContainer {
+    flex: 0 0 360px;  /* Fixed height with no grow/shrink */
+    width: 100%;
+    padding: 10px 30px;
+    box-sizing: border-box;
+    display: none;  /* Hidden by default */
+    overflow-y: auto;
+    position: relative;  /* For absolute positioning of copy button */
+}
+
+/* Add a pseudo-element for the border with margin */
+#responseContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+#responseContent {
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    font-family: inherit;
+    padding-bottom: 40px;  /* Make space for the copy button */
+}
+
+/* Markdown styles */
+#responseContent h1,
+#responseContent h2,
+#responseContent h3,
+#responseContent h4,
+#responseContent h5,
+#responseContent h6 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    line-height: 1.25;
+}
+
+#responseContent h1 { font-size: 20px; }
+#responseContent h2 { font-size: 18px; }
+#responseContent h3 { font-size: 16px; }
+#responseContent h4 { font-size: 14px; }
+
+#responseContent p {
+    margin: 8px 0;
+}
+
+#responseContent pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+#responseContent code {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 13px;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+#responseContent pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+#responseContent ul,
+#responseContent ol {
+    margin: 8px 0;
+    padding-left: 24px;
+}
+
+#responseContent blockquote {
+    margin: 8px 0;
+    padding-left: 12px;
+    border-left: 4px solid #e0e0e0;
+    color: #666;
+}
+
+#responseContent img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+#copyButton {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    -webkit-app-region: no-drag;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'%3E%3C/rect%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#copyButton:hover {
+    opacity: 1;
 }
   

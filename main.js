@@ -1,3 +1,5 @@
+const DEGUG_MODE = false;
+
 const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, nativeImage } = require('electron');
 const path = require('path');
 const Jimp = require('jimp');
@@ -48,11 +50,14 @@ function createSpotlightWindow() {
     spotlightWindow.loadFile('windows/spotlight.html');
 
     const hideSpotlightWindow = () => {
-        // test - ignore hiding window
-        // if (spotlightWindow && spotlightWindow.isVisible()) {
-        //     spotlightWindow.setVisibleOnAllWorkspaces(false);
-        //     spotlightWindow.hide();
-        // }
+        if (DEGUG_MODE) {
+            return;
+        }
+
+        if (spotlightWindow && spotlightWindow.isVisible()) {
+            spotlightWindow.setVisibleOnAllWorkspaces(false);
+            spotlightWindow.hide();
+        }
     };
 
     // Focus input when window is shown
@@ -210,21 +215,27 @@ ipcMain.handle('load-locale', async (event, locale) => {
     }
 });
 
-ipcMain.on('spotlight-content', async (_, content) => {
+ipcMain.on('spotlight-content', async (event, content) => {
     console.log('Received from spotlight:', content);
     
     try {
         const messages = [{ role: 'user', content: content }];
         const stream = await llm.streamResponse(messages);
+
         let fullResponse = '';
         
         for await (const chunk of stream) {
             fullResponse += chunk;
             console.log('Streaming chunk:', chunk);
+            // Send each chunk to the renderer process
+            spotlightWindow.webContents.send('llm-response-chunk', chunk);
         }
         
+        // Send completion signal
+        spotlightWindow.webContents.send('llm-response-done');
         console.log('Full response:', fullResponse);
     } catch (error) {
         console.error('Error getting LLM streaming response:', error);
+        spotlightWindow.webContents.send('llm-response-error', error.message);
     }
 });

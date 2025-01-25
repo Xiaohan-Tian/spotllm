@@ -11,8 +11,8 @@
   "description": "",
   "dependencies": {
     "electron-store": "^8.1.0",
-    "jimp": "^0.22.10",
-    "i18next": "^23.10.1"
+    "i18next": "^23.10.1",
+    "jimp": "^0.22.10"
   },
   "devDependencies": {
     "electron": "^34.0.1"
