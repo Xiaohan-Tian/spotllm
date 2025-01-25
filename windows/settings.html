@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <title>Settings</title>
     <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="utils/codemirror.css">
+    <script src="utils/codemirror.min.js"></script>
+    <script src="utils/codemirror-markdown.min.js"></script>
   </head>
   <body>
     <div class="sidebar">
@@ -18,8 +21,8 @@
           <div class="setting-header" data-i18n="settings.model.title"></div>
           <div class="setting-description" data-i18n="settings.model.description"></div>
           <select class="setting-input">
-            <option value="gpt-4o" data-i18n="settings.model.options.gpt4"></option>
-            <option value="gpt-4o-mini" data-i18n="settings.model.options.gpt4mini"></option>
+            <option value="gpt-4o" data-i18n="settings.model.options.gpt4o"></option>
+            <option value="gpt-4o-mini" data-i18n="settings.model.options.gpt4omini"></option>
             <option value="gemini-1-5-pro" selected data-i18n="settings.model.options.geminiPro"></option>
             <option value="gemini-1-5-flash" data-i18n="settings.model.options.geminiFlash"></option>
             <option value="gemini-1-5-flash-8b" data-i18n="settings.model.options.geminiFlash8b"></option>
@@ -64,8 +67,52 @@
         <div class="setting-item">
           <div class="setting-header" data-i18n="settings.templates.edit.title"></div>
           <div class="setting-description" data-i18n="settings.templates.edit.description"></div>
-          <select class="setting-input">
-          </select>
+          <div class="template-controls">
+            <button class="add-template-btn" aria-label="Add new template">+</button>
+            <select class="setting-input">
+            </select>
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.shortcut.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.shortcut.description"></div>
+          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.shortcut.placeholder">
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.name.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.name.description"></div>
+          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.name.placeholder">
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.responseKey.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.responseKey.description"></div>
+          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.responseKey.placeholder">
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.content.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.content.description"></div>
+          <div id="template-editor" class="setting-input template-content"></div>
+        </div>
+
+        <div class="template-actions">
+          <button class="delete-template-btn" data-i18n="settings.templates.actions.delete" style="display: none;"></button>
+          <button class="save-template-btn" data-i18n="settings.templates.actions.save"></button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay">
+      <div class="modal">
+        <div class="modal-title" data-i18n="settings.templates.confirmDelete.title"></div>
+        <div class="modal-content" data-i18n="settings.templates.confirmDelete.message"></div>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" data-i18n="settings.templates.actions.cancel"></button>
+          <button class="modal-btn confirm" data-i18n="settings.templates.actions.confirm"></button>
         </div>
       </div>
     </div>

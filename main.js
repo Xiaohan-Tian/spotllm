@@ -17,6 +17,7 @@ const store = new Store({
         apiKey: '',
         hostUrl: '',
         hideOnClickOutside: 'yes',
+        templates: []
     }
 });
 

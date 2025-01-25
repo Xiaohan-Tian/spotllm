@@ -4,8 +4,8 @@
             "title": "Model",
             "description": "Please choose the model you want to use.",
             "options": {
-                "gpt4": "OpenAI GPT-4",
-                "gpt4mini": "OpenAI GPT-4o-mini",
+                "gpt4o": "OpenAI GPT-4o",
+                "gpt4omini": "OpenAI GPT-4o-mini",
                 "geminiPro": "Google Gemini-1.5-Pro",
                 "geminiFlash": "Google Gemini-1.5-Flash",
                 "geminiFlash8b": "Google Gemini-1.5-Flash-8B",
@@ -43,7 +43,47 @@
         "templates": {
             "edit": {
                 "title": "Edit Templates",
-                "description": "Choose a template to edit."
+                "description": "Choose a template to edit.",
+                "placeholder": "Select a template"
+            },
+            "shortcut": {
+                "title": "Shortcut",
+                "description": "Please provide the shortcut the App should detect.",
+                "placeholder": "Enter shortcut"
+            },
+            "name": {
+                "title": "Template Name",
+                "description": "Please input template name, only letter, numbers and underscore (\"_\") is allowed",
+                "placeholder": "Enter template name"
+            },
+            "responseKey": {
+                "title": "Response Key",
+                "description": "If you are expecting the model retuning a JSON format response, please provide the key the App should use.",
+                "placeholder": "Enter response key"
+            },
+            "content": {
+                "title": "Template",
+                "description": "Please use markdown format.",
+                "placeholder": "Enter your template in markdown format"
+            },
+            "actions": {
+                "add": "Add new template",
+                "save": "Save",
+                "delete": "Delete",
+                "confirm": "Confirm",
+                "cancel": "Cancel"
+            },
+            "notifications": {
+                "saved": "Template has been saved",
+                "duplicateShortcut": "Shortcut can't duplicate",
+                "deleted": "Template has been deleted",
+                "emptyShortcut": "Shortcut cannot be empty",
+                "emptyName": "Template name cannot be empty",
+                "emptyTemplate": "Template content cannot be empty"
+            },
+            "confirmDelete": {
+                "title": "Delete Template",
+                "message": "Are you sure you want to delete this template?"
             }
         }
     },

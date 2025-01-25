@@ -5,14 +5,17 @@ body {
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     display: flex;
+    min-height: 100vh;
 }
 
 .sidebar {
     width: 200px;
     background-color: #1e1e1e;
-    height: 100vh;
+    min-height: 100%;
     padding: 20px 0;
     border-right: 1px solid #3d3d3d;
+    position: sticky;
+    top: 0;
 }
 
 .sidebar-item {
@@ -36,6 +39,7 @@ body {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    min-height: 100vh;
 }
 
 .section {
@@ -71,6 +75,11 @@ body {
     border-radius: 4px;
     color: #ffffff;
     box-sizing: border-box;
+}
+
+/* Override padding for CodeMirror container */
+.setting-input.template-content {
+    padding: 0;
 }
 
 .setting-input:focus {
@@ -136,4 +145,252 @@ select.setting-input {
 
 .eye-icon {
     display: block;
+}
+
+.template-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-template-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #2ea043;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-template-btn:hover {
+    background-color: #3fb950;
+}
+
+.template-controls .setting-input {
+    flex: 1;
+}
+
+.template-content {
+    min-height: 200px;
+    font-family: monospace;
+    line-height: 1.5;
+}
+
+/* CodeMirror Dark Theme */
+#template-editor div.CodeMirror-wrap {
+    border: none;
+}
+
+.CodeMirror {
+    height: auto !important;
+    min-height: 200px;
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    border: 1px solid #3d3d3d;
+    border-radius: 4px;
+    font-family: monospace;
+    line-height: 1.5;
+    padding: 0 !important;
+}
+
+.CodeMirror-scroll {
+    min-height: 200px;
+}
+
+.CodeMirror-cursor {
+    border-left: 1px solid #ffffff !important;
+}
+
+.CodeMirror-selected {
+    background: #264f78 !important;
+}
+
+.CodeMirror-focused {
+    border-color: #4d4d4d;
+}
+
+/* Markdown Syntax Highlighting */
+.cm-header { color: #569cd6 !important; }
+.cm-strong { color: #ce9178 !important; }
+.cm-em { color: #ce9178 !important; }
+.cm-link { color: #4ec9b0 !important; }
+.cm-url { color: #608b4e !important; }
+.cm-quote { color: #608b4e !important; }
+.cm-variable-2 { color: #569cd6 !important; }  /* For lists */
+.cm-comment { color: #608b4e !important; }
+.cm-keyword { color: #d7ba7d !important; }
+
+.template-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-template-btn {
+    background-color: #2ea043;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-template-btn:hover {
+    background-color: #3fb950;
+}
+
+.delete-template-btn {
+    background-color: #21262d;
+    border: 1px solid #f85149;
+    border-radius: 4px;
+    color: #f85149;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.delete-template-btn:hover {
+    background-color: #f85149;
+    color: white;
+    border-color: #f85149;
+}
+
+.cm-editor {
+    height: 100%;
+    min-height: 200px;
+    background: transparent;
+}
+
+.cm-editor .cm-content {
+    font-family: monospace;
+    color: #ffffff;
+}
+
+.cm-editor .cm-line {
+    padding: 0;
+}
+
+.cm-editor.cm-focused {
+    outline: none;
+}
+
+.cm-editor .cm-gutters {
+    background-color: #252526;
+    border-right: 1px solid #3d3d3d;
+}
+
+/* Markdown syntax highlighting */
+.cm-header { color: #569cd6; }
+.cm-strong { color: #ce9178; }
+.cm-em { color: #ce9178; }
+.cm-link { color: #4ec9b0; }
+.cm-url { color: #608b4e; }
+.cm-quote { color: #608b4e; }
+.cm-list { color: #569cd6; }
+.cm-code { color: #d7ba7d; }
+
+.notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    color: white;
+    text-align: center;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateY(0);
+}
+
+.notification.success {
+    background-color: #2ea043;
+}
+
+.notification.error {
+    background-color: #f85149;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    background-color: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.modal-content {
+    margin-bottom: 20px;
+    color: #8f8f8f;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.modal-btn.confirm {
+    background-color: #f85149;
+    border: none;
+    color: white;
+}
+
+.modal-btn.confirm:hover {
+    background-color: #ff6b64;
+}
+
+.modal-btn.cancel {
+    background-color: transparent;
+    border: 1px solid #3d3d3d;
+    color: #ffffff;
+}
+
+.modal-btn.cancel:hover {
+    background-color: #2d2d2d;
 } 

@@ -1,0 +1,11 @@
+{
+    "gpt4o": "gpt-4o",
+    "gpt4oMini": "gpt-4o-mini",
+    "geminiPro": "gemini-1.5-pro",
+    "geminiFlash": "gemini-1.5-flash",
+    "geminiFlash8b": "gemini-1.5-flash-8b",
+    "claudeSonnet": "claude-3-5-sonnet-latest",
+    "claudeOpus": "claude-3-opus-latest", 
+    "claudeHaiku": "claude-3-5-haiku-latest",
+    "private": "private"
+}
