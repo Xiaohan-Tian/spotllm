@@ -6,39 +6,67 @@
     <link rel="stylesheet" href="settings.css">
   </head>
   <body>
-    <div class="container">
-      <div class="setting-item">
-        <div class="setting-header" data-i18n="settings.model.title"></div>
-        <div class="setting-description" data-i18n="settings.model.description"></div>
-        <select class="setting-input">
-          <option value="gpt-4o" data-i18n="settings.model.options.gpt4"></option>
-          <option value="gpt-4o-mini" data-i18n="settings.model.options.gpt4mini"></option>
-          <option value="gemini-1-5-pro" selected data-i18n="settings.model.options.geminiPro"></option>
-          <option value="gemini-1-5-flash" data-i18n="settings.model.options.geminiFlash"></option>
-          <option value="gemini-1-5-flash-8b" data-i18n="settings.model.options.geminiFlash8b"></option>
-          <option value="claude-3-5-sonnet" data-i18n="settings.model.options.claudeSonnet"></option>
-          <option value="claude-3-5-opus" data-i18n="settings.model.options.claudeOpus"></option>
-          <option value="claude-3-5-haiku" data-i18n="settings.model.options.claudeHaiku"></option>
-          <option value="private" data-i18n="settings.model.options.private"></option>
-        </select>
-      </div>
+    <div class="sidebar">
+      <div class="sidebar-item active" data-section="general" data-i18n="settings.navigation.general"></div>
+      <div class="sidebar-item" data-section="behavior" data-i18n="settings.navigation.behavior"></div>
+      <div class="sidebar-item" data-section="templates" data-i18n="settings.navigation.templates"></div>
+    </div>
+    
+    <div class="main-content">
+      <div class="section active" id="general">
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.model.title"></div>
+          <div class="setting-description" data-i18n="settings.model.description"></div>
+          <select class="setting-input">
+            <option value="gpt-4o" data-i18n="settings.model.options.gpt4"></option>
+            <option value="gpt-4o-mini" data-i18n="settings.model.options.gpt4mini"></option>
+            <option value="gemini-1-5-pro" selected data-i18n="settings.model.options.geminiPro"></option>
+            <option value="gemini-1-5-flash" data-i18n="settings.model.options.geminiFlash"></option>
+            <option value="gemini-1-5-flash-8b" data-i18n="settings.model.options.geminiFlash8b"></option>
+            <option value="claude-3-5-sonnet" data-i18n="settings.model.options.claudeSonnet"></option>
+            <option value="claude-3-5-opus" data-i18n="settings.model.options.claudeOpus"></option>
+            <option value="claude-3-5-haiku" data-i18n="settings.model.options.claudeHaiku"></option>
+            <option value="private" data-i18n="settings.model.options.private"></option>
+          </select>
+        </div>
 
-      <div class="separator"></div>
+        <div class="separator"></div>
 
-      <div class="setting-item">
-        <div class="setting-header" data-i18n="settings.apiKey.title"></div>
-        <div class="setting-description" data-i18n="settings.apiKey.description"></div>
-        <div class="input-wrapper">
-          <input type="password" class="setting-input" data-i18n-placeholder="settings.apiKey.placeholder">
-          <button class="toggle-password" aria-label="Toggle password visibility"></button>
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.apiKey.title"></div>
+          <div class="setting-description" data-i18n="settings.apiKey.description"></div>
+          <div class="input-wrapper">
+            <input type="password" class="setting-input" data-i18n-placeholder="settings.apiKey.placeholder">
+            <button class="toggle-password" aria-label="Toggle password visibility"></button>
+          </div>
+        </div>
+
+        <div class="setting-item host-url-setting" style="display: none;">
+          <div class="separator"></div>
+          <div class="setting-header" data-i18n="settings.hostUrl.title"></div>
+          <div class="setting-description" data-i18n="settings.hostUrl.description"></div>
+          <input type="text" class="setting-input" data-i18n-placeholder="settings.hostUrl.placeholder">
         </div>
       </div>
 
-      <div class="setting-item host-url-setting" style="display: none;">
-        <div class="separator"></div>
-        <div class="setting-header" data-i18n="settings.hostUrl.title"></div>
-        <div class="setting-description" data-i18n="settings.hostUrl.description"></div>
-        <input type="text" class="setting-input" data-i18n-placeholder="settings.hostUrl.placeholder">
+      <div class="section" id="behavior">
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.behavior.hideOnClickOutside.title"></div>
+          <div class="setting-description" data-i18n="settings.behavior.hideOnClickOutside.description"></div>
+          <select class="setting-input">
+            <option value="yes" data-i18n="settings.behavior.hideOnClickOutside.options.yes"></option>
+            <option value="no" data-i18n="settings.behavior.hideOnClickOutside.options.no"></option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section" id="templates">
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.edit.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.edit.description"></div>
+          <select class="setting-input">
+          </select>
+        </div>
       </div>
     </div>
     <script src="../node_modules/i18next/dist/umd/i18next.min.js"></script>

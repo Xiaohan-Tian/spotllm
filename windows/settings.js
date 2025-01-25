@@ -22,10 +22,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         element.placeholder = i18next.t(key);
     });
 
-    console.log('Hello World from settings page');
-    
-    const modelSelect = document.querySelector('select.setting-input');
-    const apiKeyInput = document.querySelector('input.setting-input');
+    // Sidebar navigation
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    const sections = document.querySelectorAll('.section');
+
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Remove active class from all items and sections
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+
+            // Add active class to clicked item and corresponding section
+            item.classList.add('active');
+            const sectionId = item.getAttribute('data-section');
+            document.getElementById(sectionId).classList.add('active');
+        });
+    });
+
+    // Model and API Key handling
+    const modelSelect = document.querySelector('#general select.setting-input');
+    const apiKeyInput = document.querySelector('#general input[type="password"]');
     const togglePassword = document.querySelector('.toggle-password');
     const hostUrlSetting = document.querySelector('.host-url-setting');
     const hostUrlInput = hostUrlSetting.querySelector('.setting-input');
@@ -63,5 +79,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     hostUrlInput.addEventListener('input', async (e) => {
         await window.electronAPI.setStoreValue('hostUrl', e.target.value);
         console.log('Host URL saved');
+    });
+
+    // Behavior settings
+    const hideOnClickOutsideSelect = document.querySelector('#behavior select.setting-input');
+    hideOnClickOutsideSelect.value = await window.electronAPI.getStoreValue('hideOnClickOutside') || 'yes';
+    
+    hideOnClickOutsideSelect.addEventListener('change', async (e) => {
+        await window.electronAPI.setStoreValue('hideOnClickOutside', e.target.value);
+        console.log('Hide on click outside setting saved:', e.target.value);
     });
 }); 

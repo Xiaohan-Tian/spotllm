@@ -16,6 +16,7 @@ const store = new Store({
         model: 'gemini-1-5-pro',
         apiKey: '',
         hostUrl: '',
+        hideOnClickOutside: 'yes',
     }
 });
 
@@ -69,7 +70,11 @@ function createSpotlightWindow() {
         // Add a small delay before enabling blur event
         setTimeout(() => {
             // Hide window when clicking outside
-            spotlightWindow.on('blur', hideSpotlightWindow);
+            spotlightWindow.on('blur', () => {
+                if (store.get('hideOnClickOutside') === 'yes') {
+                    hideSpotlightWindow();
+                }
+            });
         }, 100);
     });
 

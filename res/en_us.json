@@ -24,6 +24,27 @@
             "title": "Host Base URL",
             "description": "Please provide the base URL of the private OpenAI API-compatible server.",
             "placeholder": "https://your-server.com/v1"
+        },
+        "navigation": {
+            "general": "General",
+            "behavior": "Behavior",
+            "templates": "Templates"
+        },
+        "behavior": {
+            "hideOnClickOutside": {
+                "title": "Hide Spotlight Windows when clicking outside",
+                "description": "If you click anywhere outside of the Spotlight Window, we will hide the spotlight window.",
+                "options": {
+                    "yes": "Yes",
+                    "no": "No"
+                }
+            }
+        },
+        "templates": {
+            "edit": {
+                "title": "Edit Templates",
+                "description": "Choose a template to edit."
+            }
         }
     }
 }
