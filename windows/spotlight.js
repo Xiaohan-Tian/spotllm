@@ -14,14 +14,80 @@ const copyButton = document.getElementById('copyButton');
 // Log hello world when window launches
 console.log('Hello World - Spotlight window launched');
 
+// Initialize i18next when window loads
+window.addEventListener('load', async () => {
+  await i18next.init({
+    lng: 'en_us',
+    fallbackLng: 'en_us',
+    resources: {
+      en_us: {
+        translation: await ipcRenderer.invoke('load-locale', 'en_us')
+      }
+    }
+  });
+
+  // Initial focus
+  searchInput.focus();
+});
+
+// Utility function for window height updates
+function updateWindowHeight() {
+  // Calculate height based on visible elements
+  let totalHeight = inputContainer.offsetHeight; // Input is always visible
+
+  // Add status container height if visible
+  if (statusContainer.style.display !== 'none') {
+    totalHeight += statusContainer.offsetHeight;
+  }
+
+  // Add response container height if visible
+  if (responseContainer.style.display !== 'none') {
+    totalHeight += responseContainer.offsetHeight;
+  }
+
+  // Add padding to account for window chrome
+  totalHeight += 2; // Account for potential rounding
+
+  ipcRenderer.send('resize-spotlight', totalHeight);
+}
+
+// Status utilities
+let currentAnimation = null;
+
+function showStatus(msg) {
+  // Clear any existing animation
+  if (currentAnimation) {
+    currentAnimation();
+    currentAnimation = null;
+  }
+
+  // Update status text
+  document.getElementById('statusText').textContent = msg;
+
+  // Show container and start animation
+  statusContainer.style.display = 'block';
+  currentAnimation = window.createTextWave(statusText);
+
+  // Update window height
+  updateWindowHeight();
+}
+
+function hideStatus() {
+  if (currentAnimation) {
+    currentAnimation();
+    currentAnimation = null;
+  }
+  statusContainer.style.display = 'none';
+  updateWindowHeight();
+}
+
 // Add response handlers
 let markdownText = '';
 
 ipcRenderer.on('llm-response-chunk', (_, chunk) => {
   if (responseContainer.style.display === 'none' || !responseContainer.style.display) {
     responseContainer.style.display = 'block';
-    // Simply use body height
-    ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
+    updateWindowHeight();
   }
   markdownText += chunk;
   responseContent.innerHTML = marked.parse(markdownText);
@@ -33,22 +99,20 @@ ipcRenderer.on('llm-response-done', () => {
   // Final render of markdown
   responseContent.innerHTML = marked.parse(markdownText);
   markdownText = ''; // Reset for next response
+  hideStatus(); // Hide the "Working..." status when done
 });
 
 ipcRenderer.on('llm-response-error', (_, error) => {
   responseContainer.style.display = 'block';
   responseContent.innerHTML = `<pre class="error">Error: ${error}</pre>`;
-  ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
+  hideStatus(); // Hide the "Working..." status on error
+  updateWindowHeight();
 });
 
 // Focus input when window loads
 window.addEventListener('load', () => {
   searchInput.focus();
 });
-
-// Remove the animation configuration constants and setupAnimatedText function
-// Instead, add this variable to store the cleanup function
-let currentAnimation = null;
 
 // Focus input when receiving message from main process
 ipcRenderer.on('focus-input', () => {
@@ -58,16 +122,9 @@ ipcRenderer.on('focus-input', () => {
     searchTextarea.focus();
   }
 
+  hideStatus();
   // preserve the previous state
-  // if (currentAnimation) {
-  //   currentAnimation();
-  //   currentAnimation = null;
-  // }
-
-  // preserve the previous state
-  // statusContainer.style.display = 'none';
   // responseContainer.style.display = 'none';
-
   // responseContent.textContent = '';
 });
 
@@ -75,11 +132,7 @@ ipcRenderer.on('focus-input', () => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
-    if (currentAnimation) {
-      currentAnimation();
-      currentAnimation = null;
-    }
-    statusContainer.style.display = 'none';
+    hideStatus();
     ipcRenderer.send('hide-window');
     return;
   }
@@ -95,7 +148,7 @@ document.addEventListener('keydown', (event) => {
       searchTextarea.selectionStart = searchTextarea.value.length;
       
       // Request window resize to actual content height
-      ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
+      updateWindowHeight();
     } else if (event.shiftKey && searchTextarea.style.display !== 'none') {
       // Add new line in textarea mode
       event.preventDefault();
@@ -118,17 +171,8 @@ document.addEventListener('keydown', (event) => {
         ? searchInput.value 
         : searchTextarea.value;
       
-      // Update the status animation part:
-      if (currentAnimation) {
-        currentAnimation();
-      }
-      statusContainer.style.display = 'block';
-      currentAnimation = window.createTextWave(document.getElementById('statusText'));
-      
-      // Small delay to ensure the status container is rendered
-      setTimeout(() => {
-        ipcRenderer.send('resize-spotlight', document.body.scrollHeight);
-      }, 0);
+      // Show working status
+      showStatus(i18next.t('spotlight.status.working'));
       
       // Send content to main process
       console.log('Sending content to main process:', content);

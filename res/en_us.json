@@ -46,5 +46,10 @@
                 "description": "Choose a template to edit."
             }
         }
+    },
+    "spotlight": {
+        "status": {
+            "working": "Working..."
+        }
     }
 }
