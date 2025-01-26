@@ -82,13 +82,88 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Behavior settings
-    const hideOnClickOutsideSelect = document.querySelector('#behavior select.setting-input');
+    const hideOnClickOutsideSelect = document.querySelector('.hide-on-click-setting');
+    const autoCopySelect = document.querySelector('.auto-copy-setting');
+    const hotkeyInput = document.querySelector('.hotkey-setting');
+    
+    // Load saved values
     hideOnClickOutsideSelect.value = await window.electronAPI.getStoreValue('hideOnClickOutside') || 'yes';
+    autoCopySelect.value = await window.electronAPI.getStoreValue('autoCopy') || 'no';
+    hotkeyInput.value = await window.electronAPI.getStoreValue('hotkey') || 'Shift+Space';
     
     hideOnClickOutsideSelect.addEventListener('change', async (e) => {
         await window.electronAPI.setStoreValue('hideOnClickOutside', e.target.value);
         console.log('Hide on click outside setting saved:', e.target.value);
     });
+
+    autoCopySelect.addEventListener('change', async (e) => {
+        await window.electronAPI.setStoreValue('autoCopy', e.target.value);
+        console.log('Auto copy setting saved:', e.target.value);
+    });
+
+    // Hotkey input handling
+    hotkeyInput.addEventListener('click', async () => {
+        let pressedKeys = new Set();
+        let keyHandler;
+
+        // Pause the global shortcut while recording
+        await window.electronAPI.pauseHotkey();
+
+        showConfirmDialog(  // show the dialog and move on, don't wait for user to confirm
+            i18next.t('settings.behavior.hotkey.dialog.title'),
+            i18next.t('settings.behavior.hotkey.dialog.message'),
+            false,  // show cancel
+            false  // hide confirm
+        );
+
+        // Start listening for key combinations
+        keyHandler = (e) => {
+            e.preventDefault();
+
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', keyHandler);
+                hideConfirmDialog();
+                // Resume with the previous hotkey
+                window.electronAPI.resumeHotkey();
+                return;
+            }
+
+            // Format special keys
+            const formatKey = (key) => {
+                switch (key) {
+                    case ' ': return 'Space';
+                    default: return key;
+                }
+            };
+
+            // Add the key to pressed keys
+            if (e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift') {
+                pressedKeys.add(formatKey(e.key));
+            }
+
+            // Add modifier keys if pressed
+            if (e.metaKey) pressedKeys.add('Command');
+            if (e.ctrlKey) pressedKeys.add('Control');
+            if (e.altKey) pressedKeys.add('Alt');
+            if (e.shiftKey) pressedKeys.add('Shift');
+
+            // If we have 2 or more keys pressed
+            if (pressedKeys.size >= 2) {
+                const hotkey = Array.from(pressedKeys).join('+');
+                hotkeyInput.value = hotkey;
+                window.electronAPI.setStoreValue('hotkey', hotkey);
+                document.removeEventListener('keydown', keyHandler);
+                hideConfirmDialog();
+                // Resume with the new hotkey
+                window.electronAPI.resumeHotkey(hotkey);
+            }
+        };
+
+        document.addEventListener('keydown', keyHandler);
+    });
+
+    // Make the hotkey input readonly
+    hotkeyInput.readOnly = true;
 
     // Template management
     const templateSection = document.querySelector('#templates');
@@ -120,7 +195,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Confirmation dialog utility
-    const showConfirmDialog = (title, message) => {
+    const hideConfirmDialog = () => {
+        const modalOverlay = document.querySelector('.modal-overlay');
+        modalOverlay.classList.remove('show');
+    };
+
+    const showConfirmDialog = (title, message, showCancel = true, showConfirm = true) => {
         return new Promise((resolve) => {
             const modalOverlay = document.querySelector('.modal-overlay');
             const modalTitle = modalOverlay.querySelector('.modal-title');
@@ -132,12 +212,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalTitle.textContent = title;
             modalContent.textContent = message;
 
+            // Show/hide buttons
+            confirmBtn.style.display = showConfirm ? 'block' : 'none';
+            cancelBtn.style.display = showCancel ? 'block' : 'none';
+
             // Show modal
             modalOverlay.classList.add('show');
 
             // Close modal helper
             const closeModal = () => {
-                modalOverlay.classList.remove('show');
+                hideConfirmDialog();
                 // Remove event listeners
                 modalOverlay.removeEventListener('click', handleOverlayClick);
                 confirmBtn.removeEventListener('click', handleConfirm);
@@ -164,8 +248,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Add event listeners
             modalOverlay.addEventListener('click', handleOverlayClick);
-            confirmBtn.addEventListener('click', handleConfirm);
-            cancelBtn.addEventListener('click', handleCancel);
+            if (showConfirm) {
+                confirmBtn.addEventListener('click', handleConfirm);
+            }
+            if (showCancel) {
+                cancelBtn.addEventListener('click', handleCancel);
+            }
         });
     };
 

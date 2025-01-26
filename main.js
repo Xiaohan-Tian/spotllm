@@ -11,6 +11,7 @@ const { extractJsonFromMarkdown } = require('./helpers/text-helper');
 let tray = null;
 let spotlightWindow = null;
 let settingsWindow = null;
+let currentHotkey = 'Shift+Space';
 
 const store = new Store({
     defaults: {
@@ -18,7 +19,9 @@ const store = new Store({
         apiKey: '',
         hostUrl: '',
         hideOnClickOutside: 'yes',
-        templates: []
+        templates: [],
+        autoCopy: 'no',
+        hotkey: 'Shift+Space'
     }
 });
 
@@ -175,18 +178,37 @@ async function createTray() {
     tray.setContextMenu(contextMenu);
 }
 
+function unregisterHotkey() {
+    try {
+        globalShortcut.unregister(currentHotkey);
+    } catch (error) {
+        console.error('Error unregistering hotkey:', error);
+        console.error(error.stack);
+    }
+}
+
+function registerHotkey() {
+    try {
+        globalShortcut.register(currentHotkey, () => {
+            if (spotlightWindow && spotlightWindow.isVisible()) {
+                spotlightWindow.hide();
+            } else {
+                createSpotlightWindow();
+                spotlightWindow.show();
+            }
+        });
+    } catch (error) {
+        console.error('Error registering hotkey:', error);
+        console.error(error.stack);
+    }
+}
+
 app.whenReady().then(async () => {
     await createTray();
 
-    // Register global shortcut
-    globalShortcut.register('Shift+Space', () => {
-        if (spotlightWindow && spotlightWindow.isVisible()) {
-            spotlightWindow.hide();
-        } else {
-            createSpotlightWindow();
-            spotlightWindow.show();
-        }
-    });
+    // Register initial global shortcut
+    currentHotkey = store.get('hotkey') || 'Shift+Space';
+    registerHotkey();
 });
 
 // Remove the global ESC handler since we're now handling it in the window
@@ -261,4 +283,16 @@ ipcMain.on('spotlight-content', async (event, content) => {
         console.error('Error getting LLM streaming response:', error);
         spotlightWindow.webContents.send('llm-response-error', error.message);
     }
+});
+
+// Add these IPC handlers near other IPC handlers
+ipcMain.handle('pause-hotkey', () => {
+    unregisterHotkey();
+});
+
+ipcMain.handle('resume-hotkey', (_, newHotkey) => {
+    if (newHotkey) {
+        currentHotkey = newHotkey;
+    }
+    registerHotkey();
 });

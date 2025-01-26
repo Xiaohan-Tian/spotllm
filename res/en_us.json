@@ -38,6 +38,23 @@
                     "yes": "Yes",
                     "no": "No"
                 }
+            },
+            "autoCopy": {
+                "title": "Auto Copy before Launching Spotlight Window",
+                "description": "Automatically trigger the \"Ctrl/Cmd + C\" key combination before launching the spotlight window, this will happen right after you hit the hotkeys for the spotlight window.",
+                "options": {
+                    "yes": "Yes",
+                    "no": "No"
+                }
+            },
+            "hotkey": {
+                "title": "Spotlight Window Hotkey",
+                "description": "Set the hotkey to launch the spotlight window.",
+                "placeholder": "Enter hotkey combination",
+                "dialog": {
+                    "title": "Press a Hotkey Combination",
+                    "message": "Press more than two keys at the same time, press ESC to cancel"
+                }
             }
         },
         "templates": {
