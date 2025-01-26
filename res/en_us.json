@@ -73,6 +73,11 @@
                 "description": "Please input template name, only letter, numbers and underscore (\"_\") is allowed",
                 "placeholder": "Enter template name"
             },
+            "hotkey": {
+                "title": "Template Hotkey",
+                "description": "You can define a hotkey combination for this template.",
+                "placeholder": "Enter hotkey combination"
+            },
             "responseKey": {
                 "title": "Response Key",
                 "description": "If you are expecting the model retuning a JSON format response, please provide the key the App should use.",

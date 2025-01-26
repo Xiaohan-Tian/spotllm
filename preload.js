@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     setStoreValue: (key, value) => ipcRenderer.invoke('set-store-value', key, value),
     loadLocale: (locale) => ipcRenderer.invoke('load-locale', locale),
     pauseHotkey: () => ipcRenderer.invoke('pause-hotkey'),
-    resumeHotkey: (newHotkey) => ipcRenderer.invoke('resume-hotkey', newHotkey)
+    resumeHotkey: (newHotkey) => ipcRenderer.invoke('resume-hotkey', newHotkey),
+    refreshHotkeys: () => ipcRenderer.invoke('refresh-hotkeys')
 }); 

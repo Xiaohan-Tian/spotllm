@@ -178,30 +178,47 @@ async function createTray() {
     tray.setContextMenu(contextMenu);
 }
 
-function unregisterHotkey() {
-    try {
-        globalShortcut.unregister(currentHotkey);
-    } catch (error) {
-        console.error('Error unregistering hotkey:', error);
-        console.error(error.stack);
-    }
-}
+// Register global hotkey
+const registerHotkey = async () => {
+    // Unregister any existing hotkeys first
+    unregisterHotkey();
 
-function registerHotkey() {
-    try {
-        globalShortcut.register(currentHotkey, () => {
-            if (spotlightWindow && spotlightWindow.isVisible()) {
-                spotlightWindow.hide();
-            } else {
-                createSpotlightWindow();
-                spotlightWindow.show();
-            }
-        });
-    } catch (error) {
-        console.error('Error registering hotkey:', error);
-        console.error(error.stack);
+    // Register spotlight hotkey
+    const hotkey = await store.get('hotkey');
+    if (hotkey) {
+        try {
+            globalShortcut.register(hotkey, () => {
+                showSpotlight();
+            });
+            console.log('Spotlight hotkey registered:', hotkey);
+        } catch (error) {
+            console.error('Failed to register spotlight hotkey:', error);
+        }
     }
-}
+
+    // Register template hotkeys
+    const templates = await store.get('templates') || [];
+    templates.forEach(template => {
+        if (template.hotkey) {
+            try {
+                globalShortcut.register(template.hotkey, () => {
+                    console.log('Template hotkey pressed:', template.name, template.hotkey);
+                    // Show spotlight window with template content
+                    showSpotlightWithTemplate(template);
+                });
+                console.log('Template hotkey registered:', template.name, template.hotkey);
+            } catch (error) {
+                console.error('Failed to register template hotkey:', error);
+            }
+        }
+    });
+};
+
+// Unregister global hotkey
+const unregisterHotkey = () => {
+    globalShortcut.unregisterAll();
+    console.log('All hotkeys unregistered');
+};
 
 app.whenReady().then(async () => {
     await createTray();
@@ -230,9 +247,13 @@ ipcMain.handle('get-store-value', (event, key) => {
     return store.get(key);
 });
 
-ipcMain.handle('set-store-value', (event, key, value) => {
+ipcMain.handle('set-store-value', async (event, key, value) => {
     if (!store) return false;
-    store.set(key, value);
+    await store.set(key, value);
+    // Refresh hotkeys when templates are updated
+    if (key === 'templates') {
+        await registerHotkey();
+    }
     return true;
 });
 
@@ -296,3 +317,51 @@ ipcMain.handle('resume-hotkey', (_, newHotkey) => {
     }
     registerHotkey();
 });
+
+ipcMain.handle('refresh-hotkeys', async () => {
+    await registerHotkey();
+});
+
+// Function to show spotlight window
+const showSpotlight = () => {
+    if (!spotlightWindow) {
+        createSpotlightWindow();
+    }
+    
+    if (spotlightWindow.isVisible()) {
+        spotlightWindow.hide();
+    } else {
+        spotlightWindow.show();
+        spotlightWindow.webContents.send('focus-input');
+    }
+};
+
+// Function to show spotlight with template content
+const showSpotlightWithTemplate = (template) => {
+    const isNewWindow = !spotlightWindow;
+    
+    if (isNewWindow) {
+        createSpotlightWindow();
+    }
+    
+    // Show window first so it's ready to receive the content
+    spotlightWindow.show();
+    
+    const sendContent = () => {
+        // Send template shortcut with forward slash prefix
+        spotlightWindow.webContents.send('load-template', {
+            content: `/${template.shortcut}`,
+            isSingleLine: true  // Always use single line input
+        });
+    };
+
+    if (isNewWindow) {
+        // Wait for the window to be ready before sending content
+        spotlightWindow.once('ready-to-show', () => {
+            // Add a small delay to ensure the renderer is fully initialized
+            setTimeout(sendContent, 100);
+        });
+    } else {
+        sendContent();
+    }
+};

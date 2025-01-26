@@ -84,29 +84,38 @@
           <div class="setting-description" data-i18n="settings.templates.edit.description"></div>
           <div class="template-controls">
             <button class="add-template-btn" aria-label="Add new template">+</button>
-            <select class="setting-input">
+            <select class="setting-input template-select">
             </select>
           </div>
         </div>
 
-        <div class="separator"></div>
+        <div class="template-separator separator"></div>
 
         <div class="setting-item">
           <div class="setting-header" data-i18n="settings.templates.shortcut.title"></div>
           <div class="setting-description" data-i18n="settings.templates.shortcut.description"></div>
-          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.shortcut.placeholder">
+          <input type="text" class="setting-input template-shortcut-input" data-i18n-placeholder="settings.templates.shortcut.placeholder">
         </div>
 
         <div class="setting-item">
           <div class="setting-header" data-i18n="settings.templates.name.title"></div>
           <div class="setting-description" data-i18n="settings.templates.name.description"></div>
-          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.name.placeholder">
+          <input type="text" class="setting-input template-name-input" data-i18n-placeholder="settings.templates.name.placeholder">
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-header" data-i18n="settings.templates.hotkey.title"></div>
+          <div class="setting-description" data-i18n="settings.templates.hotkey.description"></div>
+          <div class="template-hotkey-container">
+            <input type="text" class="setting-input template-hotkey-input" data-i18n-placeholder="settings.templates.hotkey.placeholder" readonly>
+            <button class="template-hotkey-delete" aria-label="Clear hotkey">×</button>
+          </div>
         </div>
 
         <div class="setting-item">
           <div class="setting-header" data-i18n="settings.templates.responseKey.title"></div>
           <div class="setting-description" data-i18n="settings.templates.responseKey.description"></div>
-          <input type="text" class="setting-input" data-i18n-placeholder="settings.templates.responseKey.placeholder">
+          <input type="text" class="setting-input template-key-input" data-i18n-placeholder="settings.templates.responseKey.placeholder">
         </div>
 
         <div class="setting-item">

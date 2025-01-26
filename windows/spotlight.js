@@ -134,6 +134,29 @@ ipcRenderer.on('focus-input', () => {
   // responseContent.textContent = '';
 });
 
+// Handle content submission
+const handleContentSubmission = () => {
+  const content = searchTextarea.style.display === 'none' || !searchTextarea.style.display
+    ? searchInput.value 
+    : searchTextarea.value;
+  
+  // Show working status
+  showStatus(i18next.t('spotlight.status.working'));
+  
+  // Update placeholder and clear input
+  if (searchTextarea.style.display === 'none' || !searchTextarea.style.display) {
+    searchInput.placeholder = content;
+    searchInput.value = '';
+  } else {
+    searchTextarea.placeholder = content;
+    searchTextarea.value = '';
+  }
+  
+  // Send content to main process
+  console.log('Sending content to main process:', content);
+  ipcRenderer.send('spotlight-content', content);
+};
+
 // Update the Enter key handler
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
@@ -173,25 +196,7 @@ document.addEventListener('keydown', (event) => {
     } else {
       // Handle regular Enter press
       event.preventDefault();
-      const content = searchTextarea.style.display === 'none' || !searchTextarea.style.display
-        ? searchInput.value 
-        : searchTextarea.value;
-      
-      // Show working status
-      showStatus(i18next.t('spotlight.status.working'));
-      
-      // Update placeholder and clear input
-      if (searchTextarea.style.display === 'none' || !searchTextarea.style.display) {
-        searchInput.placeholder = content;
-        searchInput.value = '';
-      } else {
-        searchTextarea.placeholder = content;
-        searchTextarea.value = '';
-      }
-      
-      // Send content to main process
-      console.log('Sending content to main process:', content);
-      ipcRenderer.send('spotlight-content', content);
+      handleContentSubmission();
     }
   }
 });
@@ -233,4 +238,27 @@ document.addEventListener('keydown', async (event) => {
     }
     // If there is selected text, let the default copy behavior handle it
   }
+});
+
+// Add template content handler
+ipcRenderer.on('load-template', (_, { content }) => {
+  // Always use single-line input
+  searchInput.style.display = 'block';
+  searchTextarea.style.display = 'none';
+  searchInput.value = content;
+  searchInput.focus();
+  // Place cursor at the end
+  searchInput.selectionStart = searchInput.selectionEnd = searchInput.value.length;
+  
+  // Update window height
+  updateWindowHeight();
+  
+  // Clear any previous response
+  responseContainer.style.display = 'none';
+  responseContent.innerHTML = '';
+  hideStatus();
+
+  // Automatically trigger content submission after a small delay
+  // to ensure content is properly set
+  setTimeout(handleContentSubmission, 100);
 }); 

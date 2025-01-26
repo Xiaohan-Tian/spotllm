@@ -167,15 +167,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Template management
     const templateSection = document.querySelector('#templates');
-    const templateControls = templateSection.querySelector('.template-controls').parentElement;
+    const templateSelect = document.querySelector('.template-select');
+    const addTemplateBtn = document.querySelector('.add-template-btn');
+    const saveTemplateBtn = document.querySelector('.save-template-btn');
+    const deleteTemplateBtn = document.querySelector('.delete-template-btn');
+    const templateSeparator = document.querySelector('.template-separator');
     const templateFormItems = Array.from(templateSection.querySelectorAll('.setting-item')).slice(1); // All items except the first one
-    const templateSelect = templateSection.querySelector('.template-controls select');
-    const addTemplateBtn = templateSection.querySelector('.add-template-btn');
-    const saveTemplateBtn = templateSection.querySelector('.save-template-btn');
-    const deleteTemplateBtn = templateSection.querySelector('.delete-template-btn');
-    const shortcutInput = templateSection.querySelector('input[data-i18n-placeholder="settings.templates.shortcut.placeholder"]');
-    const nameInput = templateSection.querySelector('input[data-i18n-placeholder="settings.templates.name.placeholder"]');
-    const keyInput = templateSection.querySelector('input[data-i18n-placeholder="settings.templates.responseKey.placeholder"]');
+    const shortcutInput = document.querySelector('.template-shortcut-input');
+    const nameInput = document.querySelector('.template-name-input');
+    const templateHotkeyInput = document.querySelector('.template-hotkey-input');
+    const templateHotkeyDelete = document.querySelector('.template-hotkey-delete');
+    const keyInput = document.querySelector('.template-key-input');
 
     // Create notification element
     const notification = document.createElement('div');
@@ -259,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Hide template form items by default
     const hideForm = () => {
-        templateSection.querySelector('.separator').style.display = 'none';
+        templateSeparator.style.display = 'none';
         templateFormItems.forEach(item => item.style.display = 'none');
         saveTemplateBtn.parentElement.style.display = 'none';
         deleteTemplateBtn.style.display = 'none';
@@ -296,12 +298,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         shortcutInput.value = '';
         nameInput.value = '';
         keyInput.value = '';
+        templateHotkeyInput.value = '';
         editor.setValue('');
     };
 
     // Show form with optional template data
     const showForm = (template = null) => {
-        templateSection.querySelector('.separator').style.display = 'block';
+        templateSeparator.style.display = 'block';
         templateFormItems.forEach(item => item.style.display = 'block');
         saveTemplateBtn.parentElement.style.display = 'flex';
         
@@ -312,6 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             shortcutInput.value = template.shortcut;
             nameInput.value = template.name;
             keyInput.value = template.key || '';
+            templateHotkeyInput.value = template.hotkey || '';
             editor.setValue(template.template);
         } else {
             clearForm();
@@ -336,53 +340,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Save template
-    saveTemplateBtn.addEventListener('click', async () => {
-        const shortcut = shortcutInput.value.trim();
-        const name = nameInput.value.trim();
-        const key = keyInput.value.trim();
-        const template = editor.getValue().trim();
-
-        // Validate required fields
-        if (!shortcut) {
-            showNotification(i18next.t('settings.templates.notifications.emptyShortcut'), 'error');
-            return;
-        }
-        if (!name) {
-            showNotification(i18next.t('settings.templates.notifications.emptyName'), 'error');
-            return;
-        }
-
+    const saveTemplate = async () => {
         const templates = await window.electronAPI.getStoreValue('templates') || [];
-        const existingIndex = templates.findIndex(t => t.shortcut === shortcut);
-        const currentTemplateIndex = templateSelect.value ? templates.findIndex(t => t.shortcut === templateSelect.value) : -1;
-
-        // Check for duplicate shortcut only if it's a new template or different from the current one
-        if (existingIndex >= 0 && existingIndex !== currentTemplateIndex) {
+        const currentShortcut = templateSelect.value;
+        const newTemplate = {
+            shortcut: shortcutInput.value,
+            name: nameInput.value,
+            key: keyInput.value,
+            hotkey: templateHotkeyInput.value,
+            template: editor.getValue()
+        };
+        
+        // Validate required fields
+        if (!newTemplate.shortcut || !newTemplate.name || !newTemplate.template) {
+            showNotification(i18next.t('settings.templates.notifications.missingFields'), 'error');
+            return;
+        }
+        
+        // Check for duplicate shortcuts (except when editing existing template)
+        if (!currentShortcut && templates.some(t => t.shortcut === newTemplate.shortcut)) {
             showNotification(i18next.t('settings.templates.notifications.duplicateShortcut'), 'error');
             return;
         }
-
-        const newTemplate = { shortcut, name, key, template };
-
-        if (currentTemplateIndex >= 0) {
+        
+        let updatedTemplates;
+        if (currentShortcut) {
             // Update existing template
-            templates[currentTemplateIndex] = newTemplate;
+            updatedTemplates = templates.map(t => 
+                t.shortcut === currentShortcut ? newTemplate : t
+            );
         } else {
             // Add new template
-            templates.push(newTemplate);
+            updatedTemplates = [...templates, newTemplate];
         }
-
-        // Hide form and reset dropdown for both new and existing templates
-        hideForm();
         
-        await window.electronAPI.setStoreValue('templates', templates);
+        await window.electronAPI.setStoreValue('templates', updatedTemplates);
         await loadTemplates();
-        
-        // Always reset dropdown to placeholder
-        templateSelect.value = '';
-        
+        hideForm();
         showNotification(i18next.t('settings.templates.notifications.saved'), 'success');
-    });
+    };
+
+    // Save button click handler
+    saveTemplateBtn.addEventListener('click', saveTemplate);
 
     // Delete template
     const deleteTemplate = async () => {
@@ -408,5 +407,66 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (confirmed) {
             await deleteTemplate();
         }
+    });
+
+    // Template hotkey input handling
+    templateHotkeyInput.addEventListener('click', async () => {
+        let pressedKeys = new Set();
+        let keyHandler;
+
+        showConfirmDialog(  // show the dialog and move on, don't wait for user to confirm
+            i18next.t('settings.behavior.hotkey.dialog.title'),
+            i18next.t('settings.behavior.hotkey.dialog.message'),
+            true,  // show cancel
+            false  // hide confirm
+        );
+
+        // Start listening for key combinations
+        keyHandler = (e) => {
+            e.preventDefault();
+
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', keyHandler);
+                hideConfirmDialog();
+                return;
+            }
+
+            // Format special keys
+            const formatKey = (key) => {
+                switch (key) {
+                    case ' ': return 'Space';
+                    default: return key;
+                }
+            };
+
+            // Add the key to pressed keys
+            if (e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Shift') {
+                pressedKeys.add(formatKey(e.key));
+            }
+
+            // Add modifier keys if pressed
+            if (e.metaKey) pressedKeys.add('Command');
+            if (e.ctrlKey) pressedKeys.add('Control');
+            if (e.altKey) pressedKeys.add('Alt');
+            if (e.shiftKey) pressedKeys.add('Shift');
+
+            // If we have 2 or more keys pressed
+            if (pressedKeys.size >= 2) {
+                const hotkey = Array.from(pressedKeys).join('+');
+                templateHotkeyInput.value = hotkey;
+                document.removeEventListener('keydown', keyHandler);
+                hideConfirmDialog();
+            }
+        };
+
+        document.addEventListener('keydown', keyHandler);
+    });
+
+    // Make the template hotkey input readonly
+    templateHotkeyInput.readOnly = true;
+
+    // Clear template hotkey
+    templateHotkeyDelete.addEventListener('click', () => {
+        templateHotkeyInput.value = '';
     });
 }); 
