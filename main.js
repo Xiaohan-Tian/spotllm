@@ -6,6 +6,7 @@ const Jimp = require('jimp');
 const Store = require('electron-store');  // Use directly
 const fs = require('fs').promises;
 const LLM = require('./llms/llm');  // Add this import
+const { extractJsonFromMarkdown } = require('./helpers/text-helper');
 
 let tray = null;
 let spotlightWindow = null;
@@ -22,7 +23,11 @@ const store = new Store({
 });
 
 // Initialize LLM instance
-const llm = LLM.create(store.get('model'), store.get('apiKey'), store.get('hostUrl'));
+const llm = LLM.create(
+    store.get('apiKey'), 
+    store.get('model'), 
+    store.get('hostUrl')
+);
 
 if (process.platform === 'darwin') {
     app.dock.hide();
@@ -225,7 +230,8 @@ ipcMain.on('spotlight-content', async (event, content) => {
     console.log('Received from spotlight:', content);
     
     try {
-        const messages = [{ role: 'user', content: content }];
+        const [processedContent, templateKey] = LLM.applyTemplate(content);
+        const messages = [{ role: 'user', content: processedContent }];
         const stream = await llm.streamResponse(messages);
 
         let fullResponse = '';
@@ -235,6 +241,17 @@ ipcMain.on('spotlight-content', async (event, content) => {
             console.log('Streaming chunk:', chunk);
             // Send each chunk to the renderer process
             spotlightWindow.webContents.send('llm-response-chunk', chunk);
+        }
+
+        if (templateKey) {
+            const json = extractJsonFromMarkdown(fullResponse);
+            if (json && json[templateKey]) {
+                spotlightWindow.webContents.send('llm-response-done');
+                spotlightWindow.webContents.send('llm-response-chunk', json[templateKey]);
+            }
+            else {
+                console.log('No JSON or template key found in response');
+            }
         }
         
         // Send completion signal

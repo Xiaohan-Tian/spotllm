@@ -1,8 +1,8 @@
 const LLM = require('./llm');
 
 class GPTLLM extends LLM {
-    constructor(apiKey, hostUrl = '') {
-        super(apiKey, hostUrl);
+    constructor(apiKey, model, hostUrl = '') {
+        super(apiKey, model, hostUrl);
     }
 
     async getResponse(msg) {

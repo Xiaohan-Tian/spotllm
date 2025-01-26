@@ -161,7 +161,22 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 12px;
     border-radius: 6px;
-    overflow-x: auto;
+    overflow-x: auto;  /* Change back to auto to enable auto-hide */
+    max-width: 100%;  /* Ensure pre doesn't exceed container width */
+    white-space: pre;  /* Preserve whitespace and line breaks */
+    margin: 8px 0;
+    -webkit-app-region: no-drag;  /* Make code blocks non-draggable */
+}
+
+#responseContent pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    display: inline-block;  /* Allow content to determine width */
+    min-width: 100%;  /* Ensure code takes at least full width of pre */
+    box-sizing: border-box;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 13px;
 }
 
 #responseContent code {
@@ -170,12 +185,8 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 2px 4px;
     border-radius: 3px;
-}
-
-#responseContent pre code {
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
+    white-space: pre;  /* Preserve whitespace */
+    word-wrap: normal;  /* Prevent wrapping */
 }
 
 #responseContent ul,
