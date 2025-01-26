@@ -30,7 +30,7 @@ class LLM {
 
     static applyTemplate(content) {
         if (!content.startsWith('/')) {
-            return [content, null];
+            return [content, null, false];
         }
 
         const shortcut = content.slice(1).trim();
@@ -39,7 +39,7 @@ class LLM {
         
         const matchedTemplate = templates.find(t => t.shortcut === shortcut);
         if (!matchedTemplate) {
-            return [content, null];
+            return [content, null, false];
         }
 
         let templateContent = matchedTemplate.template;
@@ -48,6 +48,11 @@ class LLM {
         if (templateContent.includes('{content}')) {
             const clipboard = require('electron').clipboard;
             templateContent = templateContent.replaceAll('{content}', clipboard.readText());
+        }
+
+        if (templateContent.includes('{clipboard}')) {
+            const clipboard = require('electron').clipboard;
+            templateContent = templateContent.replaceAll('{clipboard}', clipboard.readText());
         }
         
         if (templateContent.includes('{date}')) {
@@ -62,7 +67,7 @@ class LLM {
             templateContent = templateContent.replaceAll('{time}', timeStr);
         }
 
-        return [templateContent, matchedTemplate.key];
+        return [templateContent, matchedTemplate.key, true];
     }
 
     async getResponse(msg) {

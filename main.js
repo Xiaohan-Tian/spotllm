@@ -269,13 +269,21 @@ ipcMain.handle('load-locale', async (event, locale) => {
     }
 });
 
-ipcMain.on('spotlight-content', async (event, content) => {
+ipcMain.on('spotlight-content', async (event, {content, conversation}) => {
     console.log('Received from spotlight:', content);
+    console.log('Received from conversation length:', conversation.length);
     
     try {
-        const [processedContent, templateKey] = LLM.applyTemplate(content);
-        const messages = [{ role: 'user', content: processedContent }];
-        const stream = await llm.streamResponse(messages);
+        const [processedContent, templateKey, usingTemplate] = LLM.applyTemplate(content);
+
+        if (usingTemplate) {
+            spotlightWindow.webContents.send('update-last-user-message', processedContent);
+            if (conversation.length > 0 && conversation[conversation.length - 1].role === 'user') {
+                conversation[conversation.length - 1].content = processedContent;
+            }
+        }
+
+        const stream = await llm.streamResponse(conversation);
 
         let fullResponse = '';
         
@@ -289,16 +297,18 @@ ipcMain.on('spotlight-content', async (event, content) => {
         if (templateKey) {
             const json = extractJsonFromMarkdown(fullResponse);
             if (json && json[templateKey]) {
-                spotlightWindow.webContents.send('llm-response-done');
-                spotlightWindow.webContents.send('llm-response-chunk', json[templateKey]);
+                spotlightWindow.webContents.send('llm-response-done', json[templateKey]);
             }
             else {
+                spotlightWindow.webContents.send('llm-response-done', fullResponse);
                 console.log('No JSON or template key found in response');
             }
         }
+        else {
+            // Send completion signal
+            spotlightWindow.webContents.send('llm-response-done', fullResponse);
+        }
         
-        // Send completion signal
-        spotlightWindow.webContents.send('llm-response-done');
         console.log('Full response:', fullResponse);
     } catch (error) {
         console.error('Error getting LLM streaming response:', error);

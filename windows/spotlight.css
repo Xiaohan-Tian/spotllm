@@ -113,8 +113,8 @@ body {
     padding: 10px 30px;
     box-sizing: border-box;
     display: none;  /* Hidden by default */
-    overflow-y: auto;
     position: relative;  /* For absolute positioning of copy button */
+    -webkit-app-region: no-drag;  /* Make code blocks non-draggable */
 }
 
 /* Add a pseudo-element for the border with margin */
@@ -134,6 +134,40 @@ body {
     white-space: pre-wrap;
     font-family: inherit;
     padding-bottom: 40px;  /* Make space for the copy button */
+    height: 360px;         /* Fixed height */
+    overflow-y: auto;      /* Make content scrollable */
+    overflow-x: hidden;    /* Hide horizontal scrollbar */
+}
+
+.dialog-wrapper {
+    display: block;
+    width: 100%;
+    line-height: 1;  /* Reset line height */
+    font-size: 0;    /* Remove any text node spacing */
+    position: relative;  /* For absolute positioning of separator */
+    padding: 0px 0px 5px 0px;
+}
+
+/* Add separator for all dialog wrappers except the first one */
+.dialog-wrapper:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0px;
+    right: 0px;
+    height: 1px;
+    background-color: #f0f0f0;
+}
+
+/* Add some padding to wrappers with separators to prevent content overlap */
+.dialog-wrapper:not(:first-child) {
+    padding-top: 8px;  /* Space between separator and content */
+}
+
+.dialog-wrapper > * {
+    font-size: 14px;  /* Restore font size for children */
+    line-height: 1.5; /* Restore line height for children */
+    margin: 0;        /* Remove margins */
 }
 
 /* Markdown styles */
@@ -206,6 +240,26 @@ body {
     max-width: 100%;
     height: auto;
     border-radius: 6px;
+}
+
+#plusButton {
+    position: absolute;
+    bottom: 10px;
+    right: 44px;  /* Position it to the left of the copy button */
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    -webkit-app-region: no-drag;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#plusButton:hover {
+    opacity: 1;
 }
 
 #copyButton {

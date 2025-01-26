@@ -10,9 +10,54 @@ const statusContainer = document.getElementById('statusContainer');
 const responseContainer = document.getElementById('responseContainer');
 const responseContent = document.getElementById('responseContent');
 const copyButton = document.getElementById('copyButton');
+const plusButton = document.getElementById('plusButton');
+
+// Conversation Management
+let conversation = [];
+
+const addMessage = (role, content) => {
+  conversation.push({ role, content });
+};
+
+const removeLastMessage = () => {
+  conversation.pop();
+};
+
+const isLastMessagePendingUserMessage = () => {
+  return conversation.length > 0 && conversation[conversation.length - 1].role === 'user';
+};
+
+const updateLastUserMessage = (content) => {
+  if (isLastMessagePendingUserMessage()) {
+    conversation[conversation.length - 1].content = content;
+  }
+};
+
+const clearConversation = () => {
+  conversation = [];
+};
+
+const newConversation = () => {
+  // Clear conversation data
+  clearConversation();
+  
+  // Clear all wrapper DIVs
+  responseContent.innerHTML = '';
+  
+  // Hide containers
+  statusContainer.style.display = 'none';
+  responseContainer.style.display = 'none';
+  
+  // Reset any pending response
+  markdownText = '';
+  currentResponseWrapper = null;
+  
+  // Update window height
+  updateWindowHeight();
+};
 
 // Log hello world when window launches
-console.log('Hello World - Spotlight window launched');
+console.log('Spotlight window launched');
 
 // Initialize i18next when window loads
 window.addEventListener('load', async () => {
@@ -89,6 +134,61 @@ function hideStatus() {
 
 // Add response handlers
 let markdownText = '';
+let currentResponseWrapper = null;
+
+// Function to create a new dialog wrapper
+function createDialogWrapper() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'dialog-wrapper';
+  responseContent.appendChild(wrapper);
+  return wrapper;
+}
+
+// Function to scroll response to bottom
+function scrollToBottom() {
+  responseContent.scrollTop = responseContent.scrollHeight;
+}
+
+// Handle content submission
+const handleContentSubmission = () => {
+  const isTextarea = searchTextarea.style.display !== 'none' && searchTextarea.style.display;
+  const input = isTextarea ? searchTextarea : searchInput;
+  const content = input.value || input.placeholder;  // Use placeholder if input is empty
+  
+  // Don't proceed if both input and placeholder are empty
+  if (!content) return;
+  
+  // Show working status
+  showStatus(i18next.t('spotlight.status.working'));
+  
+  // Create wrapper for user input
+  const userWrapper = createDialogWrapper();
+  userWrapper.innerHTML = marked.parse(content);
+  scrollToBottom();
+
+  // Create wrapper for upcoming LLM response
+  currentResponseWrapper = createDialogWrapper();
+  
+  // Update placeholder and clear input
+  if (!isTextarea) {
+    searchInput.placeholder = content;
+    searchInput.value = '';
+  } else {
+    searchTextarea.placeholder = content;
+    searchTextarea.value = '';
+  }
+
+  // Add message to conversation
+  if (isLastMessagePendingUserMessage()) {
+    removeLastMessage();
+  }
+
+  addMessage('user', content);
+  
+  // Send content to main process
+  console.log('Sending content to main process:', content);
+  ipcRenderer.send('spotlight-content', {content, conversation});
+};
 
 ipcRenderer.on('llm-response-chunk', (_, chunk) => {
   if (responseContainer.style.display === 'none' || !responseContainer.style.display) {
@@ -96,23 +196,41 @@ ipcRenderer.on('llm-response-chunk', (_, chunk) => {
     updateWindowHeight();
   }
   markdownText += chunk;
-  responseContent.innerHTML = marked.parse(markdownText);
-  // Auto scroll to bottom
-  responseContainer.scrollTop = responseContainer.scrollHeight;
+  if (currentResponseWrapper) {
+    currentResponseWrapper.innerHTML = marked.parse(markdownText);
+    scrollToBottom();
+  }
 });
 
-ipcRenderer.on('llm-response-done', () => {
+ipcRenderer.on('llm-response-done', (_, finalResponse) => {
   // Final render of markdown
-  responseContent.innerHTML = marked.parse(markdownText);
+  if (currentResponseWrapper) {
+    if (finalResponse) {
+      currentResponseWrapper.innerHTML = marked.parse(finalResponse);
+    } else {
+      currentResponseWrapper.innerHTML = marked.parse(markdownText);
+    }
+    currentResponseWrapper = null;  // Clear the reference
+  }
+
+  // Add message to conversation
+  addMessage('assistant', markdownText);
+
+  // Reset for next response
   markdownText = ''; // Reset for next response
   hideStatus(); // Hide the "Working..." status when done
+  scrollToBottom();
 });
 
 ipcRenderer.on('llm-response-error', (_, error) => {
   responseContainer.style.display = 'block';
-  responseContent.innerHTML = `<pre class="error">Error: ${error}</pre>`;
+  if (currentResponseWrapper) {
+    currentResponseWrapper.innerHTML = `<pre class="error">Error: ${error}</pre>`;
+    currentResponseWrapper = null;  // Clear the reference
+  }
   hideStatus(); // Hide the "Working..." status on error
   updateWindowHeight();
+  scrollToBottom();
 });
 
 // Focus input when window loads
@@ -133,29 +251,6 @@ ipcRenderer.on('focus-input', () => {
   // responseContainer.style.display = 'none';
   // responseContent.textContent = '';
 });
-
-// Handle content submission
-const handleContentSubmission = () => {
-  const content = searchTextarea.style.display === 'none' || !searchTextarea.style.display
-    ? searchInput.value 
-    : searchTextarea.value;
-  
-  // Show working status
-  showStatus(i18next.t('spotlight.status.working'));
-  
-  // Update placeholder and clear input
-  if (searchTextarea.style.display === 'none' || !searchTextarea.style.display) {
-    searchInput.placeholder = content;
-    searchInput.value = '';
-  } else {
-    searchTextarea.placeholder = content;
-    searchTextarea.value = '';
-  }
-  
-  // Send content to main process
-  console.log('Sending content to main process:', content);
-  ipcRenderer.send('spotlight-content', content);
-};
 
 // Update the Enter key handler
 document.addEventListener('keydown', (event) => {
@@ -215,6 +310,22 @@ copyButton.addEventListener('click', async () => {
   }
 });
 
+// Add new conversation functionality
+plusButton.addEventListener('click', () => {
+  newConversation();
+  // Visual feedback
+  plusButton.style.opacity = '1';
+  setTimeout(() => {
+    plusButton.style.opacity = '0.6';
+  }, 200);
+  // Focus the input
+  if (searchTextarea.style.display === 'none' || !searchTextarea.style.display ) {
+    searchInput.focus();
+  } else {
+    searchTextarea.focus();
+  }
+});
+
 // Add keyboard shortcut for copy
 document.addEventListener('keydown', async (event) => {
   // Check for Ctrl/Cmd + C
@@ -242,6 +353,9 @@ document.addEventListener('keydown', async (event) => {
 
 // Add template content handler
 ipcRenderer.on('load-template', (_, { content }) => {
+  // clear conversation
+  clearConversation();
+
   // Always use single-line input
   searchInput.style.display = 'block';
   searchTextarea.style.display = 'none';
@@ -262,3 +376,8 @@ ipcRenderer.on('load-template', (_, { content }) => {
   // to ensure content is properly set
   setTimeout(handleContentSubmission, 100);
 }); 
+
+// add conversation handler
+ipcRenderer.on(`update-last-user-message`, (_, content) => {
+  updateLastUserMessage(content);
+});
