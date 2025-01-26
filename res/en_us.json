@@ -107,6 +107,9 @@
     "spotlight": {
         "status": {
             "working": "Working..."
+        },
+        "input": {
+            "placeholder": "Type something..."
         }
     }
 }

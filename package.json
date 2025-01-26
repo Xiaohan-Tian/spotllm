@@ -13,7 +13,8 @@
     "@google/generative-ai": "^0.21.0",
     "electron-store": "^8.1.0",
     "i18next": "^23.10.1",
-    "jimp": "^0.22.10"
+    "jimp": "^0.22.10",
+    "openai": "^4.80.1"
   },
   "devDependencies": {
     "electron": "^34.0.1"

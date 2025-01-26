@@ -30,7 +30,7 @@ class LLM {
 
     static applyTemplate(content) {
         if (!content.startsWith('/')) {
-            return content;
+            return [content, null];
         }
 
         const shortcut = content.slice(1).trim();
@@ -39,7 +39,7 @@ class LLM {
         
         const matchedTemplate = templates.find(t => t.shortcut === shortcut);
         if (!matchedTemplate) {
-            return content;
+            return [content, null];
         }
 
         let templateContent = matchedTemplate.template;

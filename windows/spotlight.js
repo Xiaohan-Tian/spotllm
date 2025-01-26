@@ -26,6 +26,12 @@ window.addEventListener('load', async () => {
     }
   });
 
+  // Set initial placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.getAttribute('data-i18n-placeholder');
+    element.placeholder = i18next.t(key);
+  });
+
   // Initial focus
   searchInput.focus();
 });
@@ -173,6 +179,15 @@ document.addEventListener('keydown', (event) => {
       
       // Show working status
       showStatus(i18next.t('spotlight.status.working'));
+      
+      // Update placeholder and clear input
+      if (searchTextarea.style.display === 'none' || !searchTextarea.style.display) {
+        searchInput.placeholder = content;
+        searchInput.value = '';
+      } else {
+        searchTextarea.placeholder = content;
+        searchTextarea.value = '';
+      }
       
       // Send content to main process
       console.log('Sending content to main process:', content);
