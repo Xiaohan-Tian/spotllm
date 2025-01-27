@@ -2,27 +2,27 @@
     "settings": {
         "model": {
             "title": "Model",
-            "description": "Please choose the model you want to use.",
+            "description": "Choose the model you want to use.",
             "options": {
                 "gpt4o": "OpenAI GPT-4o",
                 "gpt4omini": "OpenAI GPT-4o-mini",
-                "geminiPro": "Google Gemini-1.5-Pro",
-                "geminiFlash": "Google Gemini-1.5-Flash",
-                "geminiFlash8b": "Google Gemini-1.5-Flash-8B",
+                "geminiPro": "Google Gemini 1.5 Pro",
+                "geminiFlash": "Google Gemini 1.5 Flash",
+                "geminiFlash8b": "Google Gemini 1.5 Flash 8B",
                 "claudeSonnet": "Anthropic Claude 3.5 Sonnet",
                 "claudeOpus": "Anthropic Claude 3.5 Opus",
                 "claudeHaiku": "Anthropic Claude 3.5 Haiku",
-                "private": "OpenAI-Compatible Private Server"
+                "private": "Private OpenAI-Compatible Server"
             }
         },
         "apiKey": {
-            "title": "API KEY",
-            "description": "Please put your API KEY inside of the input box",
+            "title": "API Key",
+            "description": "Enter your API key below.",
             "placeholder": "Enter your API key"
         },
         "hostUrl": {
             "title": "Host Base URL",
-            "description": "Please provide the base URL of the private OpenAI API-compatible server.",
+            "description": "Provide the base URL for your private OpenAI API-compatible server.",
             "placeholder": "https://your-server.com/v1"
         },
         "navigation": {
@@ -32,77 +32,77 @@
         },
         "behavior": {
             "hideOnClickOutside": {
-                "title": "Hide Spotlight Windows when clicking outside",
-                "description": "If you click anywhere outside of the Spotlight Window, we will hide the spotlight window.",
+                "title": "Hide SpotLLM Window When Clicking Outside",
+                "description": "Automatically hide the SpotLLM window when you click outside it.",
                 "options": {
                     "yes": "Yes",
                     "no": "No"
                 }
             },
             "autoCopy": {
-                "title": "Auto Copy before Launching Spotlight Window",
-                "description": "Automatically trigger the \"Ctrl/Cmd + C\" key combination before launching the spotlight window, this will happen right after you hit the hotkeys for the spotlight window.",
+                "title": "Auto Copy Before Launching SpotLLM Window",
+                "description": "Automatically copy the selected text (Ctrl/Cmd + C) before opening the SpotLLM window using the hotkey.",
                 "options": {
                     "yes": "Yes",
                     "no": "No"
                 }
             },
             "hotkey": {
-                "title": "Spotlight Window Hotkey",
-                "description": "Set the hotkey to launch the spotlight window.",
+                "title": "SpotLLM Window Hotkey",
+                "description": "Set a hotkey combination to open the SpotLLM window.",
                 "placeholder": "Enter hotkey combination",
                 "dialog": {
                     "title": "Press a Hotkey Combination",
-                    "message": "Press more than two keys at the same time, press ESC to cancel"
+                    "message": "Press at least two keys simultaneously. Press ESC to cancel."
                 }
             }
         },
         "templates": {
             "edit": {
                 "title": "Edit Templates",
-                "description": "Choose a template to edit.",
-                "placeholder": "Select a template"
+                "description": "Select a template to modify.",
+                "placeholder": "Choose a template"
             },
             "shortcut": {
                 "title": "Shortcut",
-                "description": "Please provide the shortcut the App should detect.",
+                "description": "Enter the shortcut that the app will recognize. Users can invoke this template by typing \"/\" followed by the shortcut.",
                 "placeholder": "Enter shortcut"
             },
             "name": {
                 "title": "Template Name",
-                "description": "Please input template name, only letter, numbers and underscore (\"_\") is allowed",
+                "description": "Enter a name for the template. Only letters, numbers, and underscores (_) are allowed.",
                 "placeholder": "Enter template name"
             },
             "hotkey": {
                 "title": "Template Hotkey",
-                "description": "You can define a hotkey combination for this template.",
+                "description": "Assign a hotkey combination for this template.",
                 "placeholder": "Enter hotkey combination"
             },
             "responseKey": {
                 "title": "Response Key",
-                "description": "If you are expecting the model retuning a JSON format response, please provide the key the App should use.",
+                "description": "Specify the key to use if expecting a JSON response.",
                 "placeholder": "Enter response key"
             },
             "content": {
                 "title": "Template",
-                "description": "Please use markdown format.",
-                "placeholder": "Enter your template in markdown format"
+                "description": "Use Markdown to define the template. The following placeholders will be replaced with actual content when the template is invoked:<br /><b>{content}</b>: User input after the shortcut string.<br /><b>{clipboard}</b>: Clipboard content.<br /><b>{date}</b>: Today's date in YYYY-MM-DD format.<br /><b>{time}</b>: Current time in HH:MM:SS format.",
+                "placeholder": "Enter your template in Markdown format"
             },
             "actions": {
-                "add": "Add new template",
+                "add": "Add New Template",
                 "save": "Save",
                 "delete": "Delete",
                 "confirm": "Confirm",
                 "cancel": "Cancel"
             },
             "notifications": {
-                "saved": "Template has been saved",
-                "duplicateShortcut": "Shortcut can't duplicate",
-                "deleted": "Template has been deleted",
-                "emptyShortcut": "Shortcut cannot be empty",
-                "emptyName": "Template name cannot be empty",
-                "emptyTemplate": "Template content cannot be empty", 
-                "missingFields": "One of the following fields is missing: Shortcut, Name, Template"
+                "saved": "Template saved successfully.",
+                "duplicateShortcut": "Shortcut must be unique.",
+                "deleted": "Template deleted successfully.",
+                "emptyShortcut": "Shortcut cannot be empty.",
+                "emptyName": "Template name cannot be empty.",
+                "emptyTemplate": "Template content cannot be empty.",
+                "missingFields": "One or more required fields are missing: Shortcut, Name, Template."
             },
             "confirmDelete": {
                 "title": "Delete Template",
@@ -115,7 +115,7 @@
             "working": "Working..."
         },
         "input": {
-            "placeholder": "Press Enter to submit; press Shift+Enter to start a new line."
+            "placeholder": "Press Enter to submit or Shift+Enter for a new line."
         }
     }
 }

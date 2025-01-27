@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Translate all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        element.textContent = i18next.t(key);
+        element.innerHTML = i18next.t(key);
     });
 
     // Translate placeholders
