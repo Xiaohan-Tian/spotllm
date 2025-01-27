@@ -52,7 +52,7 @@ const isLastMessagePendingUserMessage = () => {
 
 const updateLastUserMessage = (content) => {
   if (isLastMessagePendingUserMessage()) {
-    conversation[conversation.length - 1].content = content;
+    conversation[conversation.length - 1].content.find(part => part.type === 'text').text = content;
   }
 };
 

@@ -281,7 +281,7 @@ ipcMain.on('spotlight-content', async (event, {content, conversation}) => {
         if (usingTemplate) {
             spotlightWindow.webContents.send('update-last-user-message', processedContent);
             if (conversation.length > 0 && conversation[conversation.length - 1].role === 'user') {
-                conversation[conversation.length - 1].content = processedContent;
+                conversation[conversation.length - 1].content.find(part => part.type === 'text').text = processedContent;
             }
         }
 
