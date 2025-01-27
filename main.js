@@ -347,16 +347,24 @@ const showSpotlight = () => {
             spotlightWindow.hide();
         } else {
             spotlightWindow.show();
-            spotlightWindow.webContents.send('focus-input');
+            // Add a small delay to ensure the window is ready
+            spotlightWindow.once('ready-to-show', () => {
+                // Add a small delay to ensure the renderer is fully initialized
+                setTimeout(() => {
+                    spotlightWindow.webContents.send('focus-input');
+                }, 100);
+            });
         }
     }
 };
 
 // Function to show spotlight with template content
 const showSpotlightWithTemplate = (template) => {
-    const isNewWindow = !spotlightWindow;
-    
-    if (isNewWindow) {
+    let isNewWindow = false;
+
+    if (!spotlightWindow || spotlightWindow.isDestroyed()) {
+        spotlightWindow = null;
+        isNewWindow = true;
         createSpotlightWindow();
     }
     
