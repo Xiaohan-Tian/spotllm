@@ -140,12 +140,44 @@ body {
 }
 
 .dialog-wrapper {
-    display: block;
+    display: flex;
     width: 100%;
-    line-height: 1;  /* Reset line height */
-    font-size: 0;    /* Remove any text node spacing */
     position: relative;  /* For absolute positioning of separator */
     padding: 0px 0px 5px 0px;
+    gap: 8px;  /* Space between icon and content */
+}
+
+.dialog-wrapper .icon {
+    flex: 0 0 22px;  /* Fixed width for icon */
+    height: 22px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.6;
+    padding: 16px 0px 0px 0px; /* Add padding to the top */
+}
+
+.dialog-wrapper .icon.user {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='12' cy='7' r='4'%3E%3C/circle%3E%3C/svg%3E");
+}
+
+.dialog-wrapper .icon.assistant {
+    background-image: url('../icon.png');
+}
+
+.dialog-wrapper .content {
+    flex: 1;  /* Take remaining space */
+    font-size: 0;    /* Remove any text node spacing */
+    line-height: 1;  /* Reset line height */
+    min-width: 0;    /* Allow flex item to shrink below content size */
+    overflow-x: hidden;  /* Hide horizontal overflow */
+}
+
+.dialog-wrapper .content > * {
+    font-size: 14px;  /* Restore font size for actual content */
+    line-height: 1.5; /* Restore line height for actual content */
+    margin: 0;        /* Remove margins */
+    max-width: 100%;  /* Prevent content from expanding beyond container */
 }
 
 /* Add separator for all dialog wrappers except the first one */
@@ -162,12 +194,6 @@ body {
 /* Add some padding to wrappers with separators to prevent content overlap */
 .dialog-wrapper:not(:first-child) {
     padding-top: 8px;  /* Space between separator and content */
-}
-
-.dialog-wrapper > * {
-    font-size: 14px;  /* Restore font size for children */
-    line-height: 1.5; /* Restore line height for children */
-    margin: 0;        /* Remove margins */
 }
 
 /* Markdown styles */
@@ -195,7 +221,7 @@ body {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 12px;
     border-radius: 6px;
-    overflow-x: auto;  /* Change back to auto to enable auto-hide */
+    overflow-x: auto;  /* Enable horizontal scrolling */
     max-width: 100%;  /* Ensure pre doesn't exceed container width */
     white-space: pre;  /* Preserve whitespace and line breaks */
     margin: 8px 0;
@@ -203,14 +229,12 @@ body {
 }
 
 #responseContent pre code {
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
     display: inline-block;  /* Allow content to determine width */
     min-width: 100%;  /* Ensure code takes at least full width of pre */
     box-sizing: border-box;
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-    font-size: 13px;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
 }
 
 #responseContent code {
@@ -227,6 +251,18 @@ body {
 #responseContent ol {
     margin: 8px 0;
     padding-left: 24px;
+    font-size: 0;    /* Remove text node spacing */
+    line-height: 1;  /* Reset line height */
+}
+
+#responseContent li {
+    font-size: 14px;  /* Restore font size */
+    line-height: 1.5; /* Restore line height */
+    margin: 0;        /* Remove margins */
+}
+
+#responseContent li > * {
+    margin: 8px 0;    /* Add margin to child elements of li */
 }
 
 #responseContent blockquote {

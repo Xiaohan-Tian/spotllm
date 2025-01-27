@@ -137,11 +137,22 @@ let markdownText = '';
 let currentResponseWrapper = null;
 
 // Function to create a new dialog wrapper
-function createDialogWrapper() {
+function createDialogWrapper(isUser = false) {
   const wrapper = document.createElement('div');
   wrapper.className = 'dialog-wrapper';
+
+  // Create icon
+  const icon = document.createElement('div');
+  icon.className = `icon ${isUser ? 'user' : 'assistant'}`;
+  wrapper.appendChild(icon);
+
+  // Create content container
+  const content = document.createElement('div');
+  content.className = 'content';
+  wrapper.appendChild(content);
+
   responseContent.appendChild(wrapper);
-  return wrapper;
+  return content;  // Return the content div instead of wrapper
 }
 
 // Function to scroll response to bottom
@@ -162,12 +173,12 @@ const handleContentSubmission = () => {
   showStatus(i18next.t('spotlight.status.working'));
   
   // Create wrapper for user input
-  const userWrapper = createDialogWrapper();
-  userWrapper.innerHTML = marked.parse(content);
+  const userContent = createDialogWrapper(true);
+  userContent.innerHTML = marked.parse(content);
   scrollToBottom();
 
   // Create wrapper for upcoming LLM response
-  currentResponseWrapper = createDialogWrapper();
+  currentResponseWrapper = createDialogWrapper(false);
   
   // Update placeholder and clear input
   if (!isTextarea) {
@@ -348,6 +359,23 @@ document.addEventListener('keydown', async (event) => {
       }
     }
     // If there is selected text, let the default copy behavior handle it
+  }
+
+  // Check for Ctrl/Cmd + N
+  if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
+    event.preventDefault(); // Prevent default new window behavior
+    newConversation();
+    // Visual feedback using the plus button
+    plusButton.style.opacity = '1';
+    setTimeout(() => {
+      plusButton.style.opacity = '0.6';
+    }, 200);
+    // Focus the input
+    if (searchTextarea.style.display === 'none' || !searchTextarea.style.display) {
+      searchInput.focus();
+    } else {
+      searchTextarea.focus();
+    }
   }
 });
 
