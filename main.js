@@ -170,6 +170,8 @@ async function createTray() {
     const iconImage = await getResizedIcon();
     tray = new Tray(iconImage);
     const contextMenu = Menu.buildFromTemplate([
+        { label: 'Launch SpotLLM...', click: () => showSpotlight() },
+        { type: 'separator' },
         { label: 'Settings', click: () => createSettingsWindow() },
         { type: 'separator' },
         { label: 'Quit', click: () => app.quit() }

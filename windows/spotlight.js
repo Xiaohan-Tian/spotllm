@@ -307,35 +307,28 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Add copy functionality
-copyButton.addEventListener('click', async () => {
+// Function to copy response content with visual feedback
+async function copyResponseContent() {
   try {
-    await navigator.clipboard.writeText(responseContent.textContent);
-    // Visual feedback
-    copyButton.style.opacity = '1';
-    setTimeout(() => {
-      copyButton.style.opacity = '0.6';
-    }, 200);
+    // Get the last dialog wrapper's content
+    const wrappers = responseContent.querySelectorAll('.dialog-wrapper');
+    if (wrappers.length > 0) {
+      const lastWrapper = wrappers[wrappers.length - 1];
+      const lastContent = lastWrapper.querySelector('.content');
+      await navigator.clipboard.writeText(lastContent.textContent.trim());
+      // Visual feedback
+      copyButton.style.opacity = '1';
+      setTimeout(() => {
+        copyButton.style.opacity = '0.6';
+      }, 200);
+    }
   } catch (err) {
     console.error('Failed to copy text:', err);
   }
-});
+}
 
-// Add new conversation functionality
-plusButton.addEventListener('click', () => {
-  newConversation();
-  // Visual feedback
-  plusButton.style.opacity = '1';
-  setTimeout(() => {
-    plusButton.style.opacity = '0.6';
-  }, 200);
-  // Focus the input
-  if (searchTextarea.style.display === 'none' || !searchTextarea.style.display ) {
-    searchInput.focus();
-  } else {
-    searchTextarea.focus();
-  }
-});
+// Add copy functionality
+copyButton.addEventListener('click', copyResponseContent);
 
 // Add keyboard shortcut for copy
 document.addEventListener('keydown', async (event) => {
@@ -347,16 +340,7 @@ document.addEventListener('keydown', async (event) => {
     // If there's no selection and response is visible, copy the response
     if (!selectedText && responseContainer.style.display === 'block') {
       event.preventDefault(); // Prevent default copy behavior
-      try {
-        await navigator.clipboard.writeText(responseContent.textContent);
-        // Visual feedback using the copy button
-        copyButton.style.opacity = '1';
-        setTimeout(() => {
-          copyButton.style.opacity = '0.6';
-        }, 200);
-      } catch (err) {
-        console.error('Failed to copy response:', err);
-      }
+      await copyResponseContent();
     }
     // If there is selected text, let the default copy behavior handle it
   }
@@ -376,6 +360,22 @@ document.addEventListener('keydown', async (event) => {
     } else {
       searchTextarea.focus();
     }
+  }
+});
+
+// Add new conversation functionality
+plusButton.addEventListener('click', () => {
+  newConversation();
+  // Visual feedback
+  plusButton.style.opacity = '1';
+  setTimeout(() => {
+    plusButton.style.opacity = '0.6';
+  }, 200);
+  // Focus the input
+  if (searchTextarea.style.display === 'none' || !searchTextarea.style.display ) {
+    searchInput.focus();
+  } else {
+    searchTextarea.focus();
   }
 });
 

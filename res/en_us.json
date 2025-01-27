@@ -101,7 +101,8 @@
                 "deleted": "Template has been deleted",
                 "emptyShortcut": "Shortcut cannot be empty",
                 "emptyName": "Template name cannot be empty",
-                "emptyTemplate": "Template content cannot be empty"
+                "emptyTemplate": "Template content cannot be empty", 
+                "missingFields": "One of the following fields is missing: Shortcut, Name, Template"
             },
             "confirmDelete": {
                 "title": "Delete Template",

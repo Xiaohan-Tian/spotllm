@@ -33,10 +33,15 @@ class LLM {
             return [content, null, false];
         }
 
-        const shortcut = content.slice(1).trim();
+        const shortcut = content.slice(1).split(/[\s\n\r]/)[0];
+        if (!shortcut) {
+            return [content, null, false];
+        }
+        
+        const restContent = content.slice(shortcut.length + 2).trim(); // +2 for the slash and space
         const store = new (require('electron-store'))();
         const templates = store.get('templates') || [];
-        
+
         const matchedTemplate = templates.find(t => t.shortcut === shortcut);
         if (!matchedTemplate) {
             return [content, null, false];
@@ -47,7 +52,7 @@ class LLM {
         // Replace placeholders
         if (templateContent.includes('{content}')) {
             const clipboard = require('electron').clipboard;
-            templateContent = templateContent.replaceAll('{content}', clipboard.readText());
+            templateContent = templateContent.replaceAll('{content}', restContent);
         }
 
         if (templateContent.includes('{clipboard}')) {
