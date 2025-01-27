@@ -336,15 +336,19 @@ ipcMain.handle('refresh-hotkeys', async () => {
 
 // Function to show spotlight window
 const showSpotlight = () => {
-    if (!spotlightWindow) {
+    if (!spotlightWindow || spotlightWindow.isDestroyed()) {
+        spotlightWindow = null;
         createSpotlightWindow();
     }
     
-    if (spotlightWindow.isVisible()) {
-        spotlightWindow.hide();
-    } else {
-        spotlightWindow.show();
-        spotlightWindow.webContents.send('focus-input');
+    // Ensure window exists and is not destroyed before accessing methods
+    if (spotlightWindow && !spotlightWindow.isDestroyed()) {
+        if (spotlightWindow.isVisible()) {
+            spotlightWindow.hide();
+        } else {
+            spotlightWindow.show();
+            spotlightWindow.webContents.send('focus-input');
+        }
     }
 };
 
