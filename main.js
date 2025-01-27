@@ -45,7 +45,7 @@ function createSpotlightWindow() {
 
     spotlightWindow = new BrowserWindow({
         width: 600,
-        height: 60,  // Initial height for single-line input
+        height: 62,  // Initial height for single-line input
         frame: false,
         center: true,
         show: false,
@@ -65,7 +65,7 @@ function createSpotlightWindow() {
         }
 
         if (spotlightWindow && spotlightWindow.isVisible()) {
-            spotlightWindow.setVisibleOnAllWorkspaces(false);
+            spotlightWindow.setVisibleOnAllWorkspaces(false); 
             spotlightWindow.hide();
         }
     };
