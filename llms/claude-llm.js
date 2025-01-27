@@ -15,7 +15,9 @@ class ClaudeLLM extends LLM {
         
         this.client = new Anthropic(config);
         console.log('Using Claude model:', this.modelMappings[model] || 'claude-3-5-sonnet-latest');
-        console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        if (this.apiKey && this.apiKey.length > 4) {
+            console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        }
     }
 
     async getResponse(messages) {
