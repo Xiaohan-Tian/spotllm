@@ -26,11 +26,15 @@ const store = new Store({
 });
 
 // Initialize LLM instance
-const llm = LLM.create(
-    store.get('apiKey'), 
-    store.get('model'), 
-    store.get('hostUrl')
-);
+const initializeLLM = () => {
+    return LLM.create(
+        store.get('apiKey'), 
+        store.get('model'), 
+        store.get('hostUrl')
+    );
+};
+
+let llm = initializeLLM();
 
 if (process.platform === 'darwin') {
     app.dock.hide();
@@ -389,3 +393,8 @@ const showSpotlightWithTemplate = (template) => {
         sendContent();
     }
 };
+
+// Function to update LLM instance
+ipcMain.on('update-llm', (_) => {
+    llm = initializeLLM();
+});

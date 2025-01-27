@@ -115,7 +115,7 @@
             "working": "Working..."
         },
         "input": {
-            "placeholder": "Type something..."
+            "placeholder": "Press Enter to submit; press Shift+Enter to start a new line."
         }
     }
 }

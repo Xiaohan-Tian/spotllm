@@ -8,6 +8,10 @@ body {
     min-height: 100vh;
 }
 
+.hidden {
+    display: none;
+}
+
 .sidebar {
     width: 200px;
     background-color: #1e1e1e;

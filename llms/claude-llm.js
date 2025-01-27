@@ -20,11 +20,47 @@ class ClaudeLLM extends LLM {
         }
     }
 
+    _convertImageToClaudeFormat(base64String) {
+        // Remove data URL prefix if present
+        return base64String.replace(/^data:image\/\w+;base64,/, '');
+    }
+
+    _convertMessages(messages) {
+        if (!messages || messages.length < 1) {
+            return [];
+        }
+
+        return messages.map(msg => {
+            const content = msg.content.map(part => {
+                if (part.type === 'text') {
+                    return { type: 'text', text: part.text };
+                } else if (part.type === 'image_url' && part.image_url?.url) {
+                    const imageData = this._convertImageToClaudeFormat(part.image_url.url);
+                    return {
+                        type: 'image',
+                        source: {
+                            type: 'base64',
+                            media_type: 'image/png',
+                            data: imageData
+                        }
+                    };
+                }
+                return null;
+            }).filter(Boolean);
+
+            return {
+                role: msg.role,
+                content
+            };
+        });
+    }
+
     async getResponse(messages) {
         try {
+            const convertedMessages = this._convertMessages(messages);
             const completion = await this.client.messages.create({
                 model: this.modelMappings[this.model] || 'claude-3-5-sonnet-latest',
-                messages: messages,
+                messages: convertedMessages,
                 max_tokens: 4096
             });
             
@@ -37,9 +73,10 @@ class ClaudeLLM extends LLM {
 
     async streamResponse(messages) {
         try {
+            const convertedMessages = this._convertMessages(messages);
             const stream = await this.client.messages.create({
                 model: this.modelMappings[this.model] || 'claude-3-5-sonnet-latest',
-                messages: messages,
+                messages: convertedMessages,
                 max_tokens: 4096,
                 stream: true
             });
