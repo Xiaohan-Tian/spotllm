@@ -58,6 +58,45 @@ body {
     display: none;
 }
 
+#imagePreviewContainer {
+    flex: 0 0 50px;  /* Fixed height */
+    width: 100%;
+    padding: 5px 20px;
+    box-sizing: border-box;
+    display: none;  /* Hidden by default */
+    position: relative;  /* For positioning the image and delete button */
+}
+
+#imagePreview {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;  /* This will ensure the image covers the area without distortion */
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+#imageDeleteButton {
+    position: absolute;
+    top: 0px;
+    left: 52px;  /* 20px padding + 40px image width - 8px (half of button width) */
+    width: 16px;
+    height: 16px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #666;
+    -webkit-app-region: no-drag;
+    transition: background-color 0.2s;
+}
+
+#imageDeleteButton:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
 #statusContainer {
     flex: 0 0 auto;  /* Don't grow or shrink */
     width: 100%;
@@ -165,11 +204,16 @@ body {
     background-image: url('../icon.png');
 }
 
+.dialog-wrapper .content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;  /* Stack content and image preview vertically */
+    min-width: 0;    /* Allow flex item to shrink below content size */
+}
+
 .dialog-wrapper .content {
-    flex: 1;  /* Take remaining space */
     font-size: 0;    /* Remove any text node spacing */
     line-height: 1;  /* Reset line height */
-    min-width: 0;    /* Allow flex item to shrink below content size */
     overflow-x: hidden;  /* Hide horizontal overflow */
 }
 
@@ -178,6 +222,20 @@ body {
     line-height: 1.5; /* Restore line height for actual content */
     margin: 0;        /* Remove margins */
     max-width: 100%;  /* Prevent content from expanding beyond container */
+}
+
+.dialog-wrapper .dialog-image-preview {
+    margin-top: 8px;  /* Space between content and image */
+    height: 50px;     /* Fixed height */
+    display: none;    /* Hidden by default */
+}
+
+.dialog-wrapper .dialog-image-preview img {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 /* Add separator for all dialog wrappers except the first one */

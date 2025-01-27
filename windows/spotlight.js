@@ -11,12 +11,35 @@ const responseContainer = document.getElementById('responseContainer');
 const responseContent = document.getElementById('responseContent');
 const copyButton = document.getElementById('copyButton');
 const plusButton = document.getElementById('plusButton');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const imagePreview = document.getElementById('imagePreview');
+
+// Create and add delete button
+const imageDeleteButton = document.createElement('div');
+imageDeleteButton.id = 'imageDeleteButton';
+imageDeleteButton.innerHTML = '×';  // Using × symbol for delete
+imagePreviewContainer.appendChild(imageDeleteButton);
 
 // Conversation Management
 let conversation = [];
 
-const addMessage = (role, content) => {
-  conversation.push({ role, content });
+const addMessage = (role, content, image = null) => {
+  conversation.push({ 
+    role,
+    content: [{
+      type: 'text',
+      text: content
+    }]
+   });
+
+   if (image) {
+    conversation[conversation.length - 1].content.push({
+      type: 'image_url',
+      image_url: {
+        url: image
+      }
+    });
+   }
 };
 
 const removeLastMessage = () => {
@@ -37,6 +60,18 @@ const clearConversation = () => {
   conversation = [];
 };
 
+const clearImagePreview = () => {
+  imagePreviewContainer.style.display = 'none';
+  imagePreview.src = '';
+  // Clean up object URL if it exists
+  if (imagePreview.dataset.objectUrl) {
+    URL.revokeObjectURL(imagePreview.dataset.objectUrl);
+    delete imagePreview.dataset.objectUrl;
+  }
+  updateWindowHeight();
+};
+imageDeleteButton.addEventListener('click', clearImagePreview);
+
 const newConversation = () => {
   // Clear conversation data
   clearConversation();
@@ -47,6 +82,9 @@ const newConversation = () => {
   // Hide containers
   statusContainer.style.display = 'none';
   responseContainer.style.display = 'none';
+  
+  // Clear image preview
+  clearImagePreview();
   
   // Reset any pending response
   markdownText = '';
@@ -85,6 +123,11 @@ window.addEventListener('load', async () => {
 function updateWindowHeight() {
   // Calculate height based on visible elements
   let totalHeight = inputContainer.offsetHeight; // Input is always visible
+
+  // Add image preview container height if visible
+  if (imagePreviewContainer.style.display !== 'none') {
+    totalHeight += imagePreviewContainer.offsetHeight;
+  }
 
   // Add status container height if visible
   if (statusContainer.style.display !== 'none') {
@@ -147,9 +190,21 @@ function createDialogWrapper(isUser = false) {
   wrapper.appendChild(icon);
 
   // Create content container
+  const contentContainer = document.createElement('div');
+  contentContainer.className = 'content-container';
+  wrapper.appendChild(contentContainer);
+
+  // Create content div
   const content = document.createElement('div');
   content.className = 'content';
-  wrapper.appendChild(content);
+  contentContainer.appendChild(content);
+
+  // Add image preview div for user messages
+  if (isUser) {
+    const imagePreviewDiv = document.createElement('div');
+    imagePreviewDiv.className = 'dialog-image-preview';
+    contentContainer.appendChild(imagePreviewDiv);
+  }
 
   responseContent.appendChild(wrapper);
   return content;  // Return the content div instead of wrapper
@@ -161,7 +216,7 @@ function scrollToBottom() {
 }
 
 // Handle content submission
-const handleContentSubmission = () => {
+const handleContentSubmission = async () => {
   const isTextarea = searchTextarea.style.display !== 'none' && searchTextarea.style.display;
   const input = isTextarea ? searchTextarea : searchInput;
   const content = input.value || input.placeholder;  // Use placeholder if input is empty
@@ -175,6 +230,28 @@ const handleContentSubmission = () => {
   // Create wrapper for user input
   const userContent = createDialogWrapper(true);
   userContent.innerHTML = marked.parse(content);
+
+  // Handle image if present
+  let base64Image = null;
+  if (imagePreviewContainer.style.display !== 'none' && imagePreview.src) {
+    // Create a canvas to convert the image to PNG
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = imagePreview.naturalWidth;
+    canvas.height = imagePreview.naturalHeight;
+    ctx.drawImage(imagePreview, 0, 0);
+    
+    // Convert to base64 PNG
+    base64Image = canvas.toDataURL('image/png');
+
+    // Add image to dialog preview
+    const dialogImagePreview = userContent.parentElement.querySelector('.dialog-image-preview');
+    const dialogImage = document.createElement('img');
+    dialogImage.src = imagePreview.src;
+    dialogImagePreview.appendChild(dialogImage);
+    dialogImagePreview.style.display = 'block';
+  }
+
   scrollToBottom();
 
   // Create wrapper for upcoming LLM response
@@ -189,12 +266,15 @@ const handleContentSubmission = () => {
     searchTextarea.value = '';
   }
 
+  // Clear the input image preview
+  clearImagePreview();
+
   // Add message to conversation
   if (isLastMessagePendingUserMessage()) {
     removeLastMessage();
   }
 
-  addMessage('user', content);
+  addMessage('user', content, base64Image);
   
   // Send content to main process
   console.log('Sending content to main process:', content);
@@ -264,7 +344,7 @@ ipcRenderer.on('focus-input', () => {
 });
 
 // Update the Enter key handler
-document.addEventListener('keydown', (event) => {
+document.addEventListener('keydown', async (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
     hideStatus();
@@ -302,7 +382,7 @@ document.addEventListener('keydown', (event) => {
     } else {
       // Handle regular Enter press
       event.preventDefault();
-      handleContentSubmission();
+      await handleContentSubmission();
     }
   }
 });
@@ -343,6 +423,40 @@ document.addEventListener('keydown', async (event) => {
       await copyResponseContent();
     }
     // If there is selected text, let the default copy behavior handle it
+  }
+
+  // Check for Ctrl/Cmd + V
+  if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+    // Read clipboard content
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        // Check if the clipboard item contains an image
+        if (item.types.includes('image/png') || 
+            item.types.includes('image/jpeg') || 
+            item.types.includes('image/gif') ||
+            item.types.includes('image/webp')) {
+          console.log('clipboard contains an image');
+          event.preventDefault(); // Prevent default paste behavior
+
+          // Get the image blob
+          const imageType = item.types.find(type => type.startsWith('image/'));
+          const imageBlob = await item.getType(imageType);
+          
+          // Create object URL and display image
+          const imageUrl = URL.createObjectURL(imageBlob);
+          imagePreview.src = imageUrl;
+          imagePreview.dataset.objectUrl = imageUrl;  // Store URL for cleanup
+          imagePreviewContainer.style.display = 'block';
+          
+          // Update window height
+          updateWindowHeight();
+          break;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to read clipboard:', err);
+    }
   }
 
   // Check for Ctrl/Cmd + N
@@ -402,7 +516,9 @@ ipcRenderer.on('load-template', (_, { content }) => {
 
   // Automatically trigger content submission after a small delay
   // to ensure content is properly set
-  setTimeout(handleContentSubmission, 100);
+  setTimeout(async () => {
+    await handleContentSubmission();
+  }, 100);
 }); 
 
 // add conversation handler

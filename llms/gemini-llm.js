@@ -20,10 +20,10 @@ class GeminiLLM extends LLM {
             return [null, []];
         }
 
-        const lastMessage = messages[messages.length - 1].content;
+        const lastMessage = messages[messages.length - 1].content.find(part => part.type === 'text').text;
         const previousMessages = messages.slice(0, -1).map(msg => ({
             role: msg.role === 'assistant' ? 'model' : msg.role,
-            parts: [{ text: msg.content }]
+            parts: [{ text: msg.content.find(part => part.type === 'text').text }]
         }));
         return [lastMessage, previousMessages];
     }
