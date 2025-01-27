@@ -9,7 +9,9 @@ class GeminiLLM extends LLM {
             model: this.modelMappings[model] || this.modelMappings.geminiPro
         });
         console.log('Using Gemini model:', this.modelMappings[model] || this.modelMappings.geminiPro);
-        console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        if (this.apiKey && this.apiKey.length > 4) {
+            console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        }
     }
 
     // Convert OpenAI-style messages to Gemini format

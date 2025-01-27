@@ -15,7 +15,9 @@ class GPTLLM extends LLM {
         
         this.client = new OpenAI(config);
         console.log('Using GPT model:', this.modelMappings[model] || 'gpt-4o');
-        console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        if (this.apiKey && this.apiKey.length > 4) {
+            console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
+        }
     }
 
     async getResponse(messages) {
