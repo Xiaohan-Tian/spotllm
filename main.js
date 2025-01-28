@@ -303,16 +303,16 @@ ipcMain.on('spotlight-content', async (event, {content, conversation}) => {
         if (templateKey) {
             const json = extractJsonFromMarkdown(fullResponse);
             if (json && json[templateKey]) {
-                spotlightWindow.webContents.send('llm-response-done', json[templateKey]);
+                spotlightWindow.webContents.send('llm-response-done', {finalResponse: json[templateKey], useMarkdown: false});
             }
             else {
-                spotlightWindow.webContents.send('llm-response-done', fullResponse);
+                spotlightWindow.webContents.send('llm-response-done', {finalResponse: fullResponse, useMarkdown: true});
                 console.log('No JSON or template key found in response');
             }
         }
         else {
             // Send completion signal
-            spotlightWindow.webContents.send('llm-response-done', fullResponse);
+            spotlightWindow.webContents.send('llm-response-done', {finalResponse: fullResponse, useMarkdown: true});
         }
         
         console.log('Full response:', fullResponse);
