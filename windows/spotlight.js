@@ -293,13 +293,13 @@ ipcRenderer.on('llm-response-chunk', (_, chunk) => {
   }
 });
 
-ipcRenderer.on('llm-response-done', (_, finalResponse) => {
+ipcRenderer.on('llm-response-done', (_, {finalResponse, useMarkdown}) => {
   // Final render of markdown
   if (currentResponseWrapper) {
     if (finalResponse) {
-      currentResponseWrapper.innerHTML = marked.parse(finalResponse);
+      currentResponseWrapper.innerHTML = useMarkdown ? marked.parse(finalResponse) : `<pre><code>${finalResponse}</code></pre>`;
     } else {
-      currentResponseWrapper.innerHTML = marked.parse(markdownText);
+      currentResponseWrapper.innerHTML = useMarkdown ? marked.parse(markdownText) : `<pre><code>${markdownText}</code></pre>`;
     }
     currentResponseWrapper = null;  // Clear the reference
   }
