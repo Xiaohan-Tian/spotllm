@@ -1,3 +1,5 @@
+import { showConfirmDialog, hideConfirmDialog } from './utils/dialog-utils.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize i18next
     await i18next.init({
