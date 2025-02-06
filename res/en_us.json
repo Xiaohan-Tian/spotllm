@@ -9,6 +9,8 @@
                 "geminiPro": "Google Gemini 1.5 Pro",
                 "geminiFlash": "Google Gemini 1.5 Flash",
                 "geminiFlash8b": "Google Gemini 1.5 Flash 8B",
+                "geminiFlash20": "Google Gemini 2.0 Flash",
+                "geminiFlash20Lite": "Google Gemini 2.0 Flash Lite",
                 "claudeSonnet": "Anthropic Claude 3.5 Sonnet",
                 "claudeOpus": "Anthropic Claude 3.5 Opus",
                 "claudeHaiku": "Anthropic Claude 3.5 Haiku",
