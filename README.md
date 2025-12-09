@@ -11,9 +11,9 @@ SpotLLM is a powerful desktop application that brings AI assistance to your fing
 - **Quick Access**: 
   - Launch with a customizable global hotkey (default: Shift+Space)
 - **Multiple AI Models Support**:
-  - OpenAI GPT-4 and variants
-  - Anthropic Claude 3.5 (Sonnet, Opus, Haiku)
-  - Google Gemini 1.5 (Pro, Flash, Flash 8B)
+  - OpenAI GPT-5 family (5.1, Chat Latest, Codex, Mini, Nano) plus GPT-4o variants
+  - Anthropic Claude 4.5 (Sonnet, Opus, Haiku) and Claude 3.5 (Sonnet, Opus, Haiku)
+  - Google Gemini 3 Pro Preview, 2.5 Flash (regular & Lite), 2.0 Flash (regular & Lite), and 1.5 family (Pro, Flash, Flash 8B)
   - Private OpenAI-compatible servers
 - **Customizable Templates**:
   - Create and manage reusable prompt templates
@@ -132,9 +132,9 @@ The Settings window provides comprehensive configuration options for SpotLLM. Yo
 
 #### General Settings
 - **Model Selection**: Choose your preferred AI model from the available options: (require restart to take effect)
-  - OpenAI models (GPT-4o, GPT-4o-mini)
-  - Google Gemini models (1.5 Pro, Flash, Flash 8B)
-  - Anthropic Claude models (3.5 Sonnet, Opus, Haiku)
+  - OpenAI models (GPT-5.1, GPT-5.1 Chat Latest, GPT-5.1 Codex, GPT-5 Mini, GPT-5 Nano, GPT-4o, GPT-4o-mini)
+  - Google Gemini models (3 Pro Preview, 2.5 Flash, 2.5 Flash Lite, 2.0 Flash, 2.0 Flash Lite, 1.5 Pro, 1.5 Flash, 1.5 Flash 8B)
+  - Anthropic Claude models (4.5 Sonnet, 4.5 Opus, 4.5 Haiku, 3.5 Sonnet, 3.5 Opus, 3.5 Haiku)
   - Private OpenAI-compatible server option
 - **API Key**: Enter your API key for the selected model (require restart to take effect)
 - **Host URL**: (Only visible when using a private server) Specify your server's base URL

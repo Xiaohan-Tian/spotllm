@@ -15,7 +15,7 @@ let currentHotkey = 'Shift+Space';
 
 const store = new Store({
     defaults: {
-        model: 'gemini-1-5-pro',
+        model: 'gemini-2.5-flash',
         apiKey: '',
         hostUrl: '',
         hideOnClickOutside: 'yes',

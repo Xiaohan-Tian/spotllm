@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const togglePassword = document.querySelector('.toggle-password');
     const hostUrlSetting = document.querySelector('.host-url-setting');
     const hostUrlInput = hostUrlSetting.querySelector('.setting-input');
+    const notifyLLMUpdate = () => {
+        window.electronAPI.updateLLM();
+    };
 
     // Load saved values
     modelSelect.value = await window.electronAPI.getStoreValue('model') || 'gemini-1-5-pro';
@@ -71,16 +74,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         await window.electronAPI.setStoreValue('model', e.target.value);
         console.log('Model saved:', e.target.value);
         updateHostUrlVisibility();
+        notifyLLMUpdate();
     });
 
     apiKeyInput.addEventListener('input', async (e) => {
         await window.electronAPI.setStoreValue('apiKey', e.target.value);
         console.log('API key saved');
+        notifyLLMUpdate();
     });
 
     hostUrlInput.addEventListener('input', async (e) => {
         await window.electronAPI.setStoreValue('hostUrl', e.target.value);
         console.log('Host URL saved');
+        notifyLLMUpdate();
     });
 
     // Behavior settings
