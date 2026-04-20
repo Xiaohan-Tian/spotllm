@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const togglePassword = document.querySelector('.toggle-password');
     const hostUrlSetting = document.querySelector('.host-url-setting');
     const hostUrlInput = hostUrlSetting.querySelector('.setting-input');
+    const customModelNameSetting = document.querySelector('.custom-model-name-setting');
+    const customModelNameInput = customModelNameSetting.querySelector('.setting-input');
     const notifyLLMUpdate = () => {
         window.electronAPI.updateLLM();
     };
@@ -55,10 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     modelSelect.value = await window.electronAPI.getStoreValue('model') || 'gemini-1-5-pro';
     apiKeyInput.value = await window.electronAPI.getStoreValue('apiKey') || '';
     hostUrlInput.value = await window.electronAPI.getStoreValue('hostUrl') || '';
+    customModelNameInput.value = await window.electronAPI.getStoreValue('customModelName') || '';
 
-    // Show/hide host URL setting based on model selection
+    // Show/hide host URL and custom model name settings based on model selection
     const updateHostUrlVisibility = () => {
-        hostUrlSetting.style.display = modelSelect.value === 'private' ? 'block' : 'none';
+        const isPrivate = modelSelect.value === 'private';
+        hostUrlSetting.style.display = isPrivate ? 'block' : 'none';
+        customModelNameSetting.style.display = isPrivate ? 'block' : 'none';
     };
     updateHostUrlVisibility();
 
@@ -86,6 +91,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     hostUrlInput.addEventListener('input', async (e) => {
         await window.electronAPI.setStoreValue('hostUrl', e.target.value);
         console.log('Host URL saved');
+        notifyLLMUpdate();
+    });
+
+    customModelNameInput.addEventListener('input', async (e) => {
+        await window.electronAPI.setStoreValue('customModelName', e.target.value);
+        console.log('Custom model name saved');
         notifyLLMUpdate();
     });
 

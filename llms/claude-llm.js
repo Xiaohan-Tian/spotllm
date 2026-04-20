@@ -2,19 +2,19 @@ const LLM = require('./llm');
 const Anthropic = require('@anthropic-ai/sdk');
 
 class ClaudeLLM extends LLM {
-    constructor(apiKey, model, hostUrl = '') {
-        super(apiKey, model, hostUrl);
+    constructor(apiKey, model, hostUrl = '', customModelName = '') {
+        super(apiKey, model, hostUrl, customModelName);
         const config = {
             apiKey: this.apiKey
         };
-        
+
         // If hostUrl is provided, use it as a custom base URL
         if (this.modelMappings[model] === 'private' && this.hostUrl) {
             config.baseURL = this.hostUrl;
         }
-        
+
         this.client = new Anthropic(config);
-        console.log('Using Claude model:', this.modelMappings[model] || 'claude-3-5-sonnet-latest');
+        console.log('Using Claude model:', this.customModelName || this.modelMappings[model] || 'claude-3-5-sonnet-latest');
         if (this.apiKey && this.apiKey.length > 4) {
             console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
         }
@@ -58,12 +58,13 @@ class ClaudeLLM extends LLM {
     async getResponse(messages) {
         try {
             const convertedMessages = this._convertMessages(messages);
+            const modelName = this.customModelName || this.modelMappings[this.model] || 'claude-3-5-sonnet-latest';
             const completion = await this.client.messages.create({
-                model: this.modelMappings[this.model] || 'claude-3-5-sonnet-latest',
+                model: modelName,
                 messages: convertedMessages,
                 max_tokens: 4096
             });
-            
+
             return completion.content[0].text;
         } catch (error) {
             console.error('Claude API error:', error);
@@ -74,8 +75,9 @@ class ClaudeLLM extends LLM {
     async streamResponse(messages) {
         try {
             const convertedMessages = this._convertMessages(messages);
+            const modelName = this.customModelName || this.modelMappings[this.model] || 'claude-3-5-sonnet-latest';
             const stream = await this.client.messages.create({
-                model: this.modelMappings[this.model] || 'claude-3-5-sonnet-latest',
+                model: modelName,
                 messages: convertedMessages,
                 max_tokens: 4096,
                 stream: true

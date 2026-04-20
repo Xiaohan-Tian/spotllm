@@ -2,13 +2,13 @@ const LLM = require('./llm');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 class GeminiLLM extends LLM {
-    constructor(apiKey, model, hostUrl = '') {
-        super(apiKey, model, hostUrl);
+    constructor(apiKey, model, hostUrl = '', customModelName = '') {
+        super(apiKey, model, hostUrl, customModelName);
         this.genAI = new GoogleGenerativeAI(this.apiKey);
         this.model = this.genAI.getGenerativeModel({
-            model: this.modelMappings[model] || this.modelMappings.geminiPro
+            model: this.customModelName || this.modelMappings[model] || this.modelMappings.geminiPro
         });
-        console.log('Using Gemini model:', this.modelMappings[model] || this.modelMappings.geminiPro);
+        console.log('Using Gemini model:', this.customModelName || this.modelMappings[model] || this.modelMappings.geminiPro);
         if (this.apiKey && this.apiKey.length > 4) {
             console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
         }

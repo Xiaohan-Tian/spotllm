@@ -9,6 +9,11 @@
                 "gpt51Codex": "OpenAI GPT-5.1 Codex",
                 "gpt5Mini": "OpenAI GPT-5 Mini",
                 "gpt5Nano": "OpenAI GPT-5 Nano",
+                "gpt52": "OpenAI GPT-5.2",
+                "gpt53Codex": "OpenAI GPT-5.3 Codex",
+                "gpt53CodexSpark": "OpenAI GPT-5.3 Codex Spark",
+                "gpt54": "OpenAI GPT-5.4",
+                "gpt54Mini": "OpenAI GPT-5.4 Mini",
                 "gpt4o": "OpenAI GPT-4o",
                 "gpt4omini": "OpenAI GPT-4o-mini",
                 "gemini3ProPreview": "Google Gemini 3 Pro Preview",
@@ -37,6 +42,11 @@
             "title": "Host Base URL",
             "description": "Provide the base URL for your private OpenAI API-compatible server.",
             "placeholder": "https://your-server.com/v1"
+        },
+        "customModelName": {
+            "title": "Custom Model Name",
+            "description": "Enter the model name to use with your private server (e.g., gpt-4, llama-2-70b-chat).",
+            "placeholder": "Enter model name"
         },
         "navigation": {
             "general": "General",

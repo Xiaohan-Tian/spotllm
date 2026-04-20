@@ -18,6 +18,7 @@ const store = new Store({
         model: 'gemini-2.5-flash',
         apiKey: '',
         hostUrl: '',
+        customModelName: '',
         hideOnClickOutside: 'yes',
         templates: [],
         autoCopy: 'no',
@@ -28,9 +29,10 @@ const store = new Store({
 // Initialize LLM instance
 const initializeLLM = () => {
     return LLM.create(
-        store.get('apiKey'), 
-        store.get('model'), 
-        store.get('hostUrl')
+        store.get('apiKey'),
+        store.get('model'),
+        store.get('hostUrl'),
+        store.get('customModelName')
     );
 };
 

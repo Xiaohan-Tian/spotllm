@@ -2,8 +2,8 @@ const LLM = require('./llm');
 const OpenAI = require('openai');
 
 class GPTLLM extends LLM {
-    constructor(apiKey, model, hostUrl = '') {
-        super(apiKey, model, hostUrl);
+    constructor(apiKey, model, hostUrl = '', customModelName = '') {
+        super(apiKey, model, hostUrl, customModelName);
         const config = {
             apiKey: this.apiKey
         };
@@ -12,9 +12,9 @@ class GPTLLM extends LLM {
         if (this.modelMappings[model] === `private` && this.hostUrl) {
             config.baseURL = this.hostUrl;
         }
-        
+
         this.client = new OpenAI(config);
-        console.log('Using GPT model:', this.modelMappings[model] || 'gpt-4o');
+        console.log('Using GPT model:', this.customModelName || this.modelMappings[model] || 'gpt-4o');
         if (this.apiKey && this.apiKey.length > 4) {
             console.log('API Key:', '*'.repeat(this.apiKey.length - 4) + this.apiKey.slice(-4));
         }
@@ -22,11 +22,12 @@ class GPTLLM extends LLM {
 
     async getResponse(messages) {
         try {
+            const modelName = this.customModelName || this.modelMappings[this.model] || 'gpt-4o';
             const completion = await this.client.chat.completions.create({
-                model: this.modelMappings[this.model] || 'gpt-4o',
+                model: modelName,
                 messages: messages,
             });
-            
+
             return completion.choices[0].message.content;
         } catch (error) {
             console.error('GPT API error:', error);
@@ -36,8 +37,9 @@ class GPTLLM extends LLM {
 
     async streamResponse(messages) {
         try {
+            const modelName = this.customModelName || this.modelMappings[this.model] || 'gpt-4o';
             const stream = await this.client.chat.completions.create({
-                model: this.modelMappings[this.model] || 'gpt-4o',
+                model: modelName,
                 messages: messages,
                 stream: true,
             });

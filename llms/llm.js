@@ -5,7 +5,7 @@ const fs = require('fs');
 class LLM {
     static modelMappings = null;
 
-    constructor(apiKey, model, hostUrl = '') {
+    constructor(apiKey, model, hostUrl = '', customModelName = '') {
         if (this.constructor === LLM) {
             throw new Error('LLM is an abstract class and cannot be instantiated directly');
         }
@@ -25,6 +25,7 @@ class LLM {
         this.apiKey = apiKey;
         this.model = model;
         this.hostUrl = hostUrl;
+        this.customModelName = customModelName;
         this.modelMappings = LLM.modelMappings;
     }
 
@@ -84,7 +85,7 @@ class LLM {
     }
 
     // Factory method to create the appropriate LLM instance
-    static create(apiKey, model, hostUrl = '') {
+    static create(apiKey, model, hostUrl = '', customModelName = '') {
         let LLMClass;
         const modelLower = model.toLowerCase();
 
@@ -98,7 +99,7 @@ class LLM {
             throw new Error(`Unsupported model: ${model}`);
         }
 
-        return new LLMClass(apiKey, model, hostUrl);
+        return new LLMClass(apiKey, model, hostUrl, customModelName);
     }
 }
 
